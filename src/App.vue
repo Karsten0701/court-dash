@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import Nav from "./components/Nav.vue";
+import AdminHeader from "./components/AdminHeader.vue";
 
 const router = useRouter();
 const isInitialLoad = ref(true);
@@ -14,13 +14,16 @@ router.isReady().then(() => {
 </script>
 
 <template>
-  <div class="min-h-screen pb-20 md:pb-28">
-    <router-view v-slot="{ Component, route }">
-      <Transition :name="isInitialLoad ? '' : 'page'" mode="out-in">
-        <component :is="Component" :key="route.path" />
-      </Transition>
-    </router-view>
-    <Nav />
+  <div class="min-h-screen bg-court text-snow">
+    <AdminHeader />
+
+    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-10">
+      <router-view v-slot="{ Component, route }">
+        <Transition :name="isInitialLoad ? '' : 'page'" mode="out-in">
+          <component :is="Component" :key="route.path" />
+        </Transition>
+      </router-view>
+    </main>
   </div>
 </template>
 
@@ -41,14 +44,5 @@ router.isReady().then(() => {
 .page-leave-to {
   opacity: 0;
   /* transform: translateX(-20px); */
-}
-
-:root {
-  --nav-h: 5rem;
-}
-@media (min-width: 768px) {
-  :root {
-    --nav-h: 7rem;
-  }
 }
 </style>
