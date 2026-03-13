@@ -1,0 +1,44 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap");
+@import "./base.css";
+
+:root {
+  --asphalt: #252525;
+  --asphalt-light: #2e2e2e;
+  --asphalt-muted: #6b6b6b;
+  --charcoal: #1e1e1e;
+  --racket: #3b82f6;
+  --snow: #f0f0f0;
+}
+
+::selection {
+  background: var(--racket);
+  color: var(--snow);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--charcoal);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--asphalt-light);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--asphalt-muted);
+}
+
+/* Prevent browser autofill from overriding dark theme input styles */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--asphalt) inset !important;
+  -webkit-text-fill-color: var(--snow) !important;
+  caret-color: var(--snow);
+  transition: background-color 5000s ease-in-out 0s;
+}
