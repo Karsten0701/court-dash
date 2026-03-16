@@ -5,8 +5,8 @@ import apiService from "./apiService.js";
  * Uses /player and /users endpoints for listing and CRUD.
  */
 class PlayersService {
-  async listLeaderboard() {
-    return apiService.getLeaderboard();
+  async listUsers() {
+    return apiService.getUsers();
   }
 
   async searchPlayers(username) {

@@ -1,9 +1,11 @@
 <script setup>
 import { computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import appConfig from "@/config/appConfig";
+import authService from "@/services/authService.js";
 
 const route = useRoute();
+const router = useRouter();
 
 const tabs = [
   { to: "/", label: "Overview", name: "Dashboard", icon: "gauge-high" },
@@ -19,6 +21,14 @@ const pageTitle = computed(() => {
   if (route.name === "Dashboard") return "Overview";
   return route.name || "Dashboard";
 });
+
+const handleLogout = async () => {
+  try {
+    await authService.logout();
+  } finally {
+    router.push("/login");
+  }
+};
 </script>
 
 <template>
@@ -63,19 +73,21 @@ const pageTitle = computed(() => {
           </router-link>
         </nav>
 
-        <div
-          class="hidden sm:flex items-center gap-2 rounded-full bg-asphalt px-3 py-1.5 text-xs"
+        <button
+          type="button"
+          class="hidden sm:inline-flex items-center gap-2 rounded-full bg-asphalt px-3 py-1.5 text-xs hover:bg-asphalt-light"
+          @click="handleLogout"
         >
           <span
             class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-turf text-snow text-[11px] font-semibold"
           >
             A
           </span>
-          <div class="leading-tight">
+          <div class="leading-tight text-left">
             <p class="font-medium text-snow text-xs">Admin</p>
-            <p class="text-[10px] text-asphalt-muted">Management Console</p>
+            <p class="text-[10px] text-asphalt-muted">Logout</p>
           </div>
-        </div>
+        </button>
       </div>
     </div>
   </header>

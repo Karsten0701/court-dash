@@ -31,11 +31,11 @@ const editForm = ref({
 });
 
 const {
-  data: leaderboard,
+  data: users,
   loading,
   error,
   execute: fetchPlayers,
-} = useApiRequest(() => playersService.listLeaderboard(), {
+} = useApiRequest(() => playersService.listUsers(), {
   immediate: true,
   maxRetries: 1,
 });
@@ -58,7 +58,13 @@ const showToast = (type, message) => {
 
 const filteredPlayers = computed(() => {
   const term = search.value.trim().toLowerCase();
-  let list = leaderboard.value || [];
+  let list = (users.value || []).map((u, index) => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    elo: u.elo ?? 1000,
+    rank: index + 1,
+  }));
 
   if (term) {
     list = list.filter((p) =>

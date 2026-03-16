@@ -412,6 +412,22 @@ class ApiService {
   // ========== USERS ENDPOINTS ==========
 
   /**
+   * Get all users (admin only)
+   *
+   * @async
+   * @requires Authentication - Admin role required.
+   * @returns {Promise<Array>} - List of users
+   * @throws {Error}
+   */
+  async getUsers() {
+    const response = await this.authenticatedFetch(`${this.baseURL}/users`, {
+      method: "GET",
+    });
+
+    return await this.handleResponse(response);
+  }
+
+  /**
    * Register a new user
    *
    * @async

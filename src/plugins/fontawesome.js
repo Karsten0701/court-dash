@@ -13,8 +13,10 @@ import {
   faCreditCard,
   faCrown,
   faEdit,
+  faPen,
   faExclamationCircle,
   faEye,
+  faGaugeHigh,
   faHome,
   faHouse,
   faMinus,
@@ -29,6 +31,7 @@ import {
   faSpinner,
   faStar,
   faTimes,
+  faTableTennisPaddleBall,
   faTrash,
   faTrashAlt,
   faTrophy,
@@ -37,6 +40,7 @@ import {
   faUserPlus,
   faUsers,
   faWallet,
+  faServer,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -52,8 +56,10 @@ library.add(
   faCreditCard,
   faCrown,
   faEdit,
+  faPen,
   faExclamationCircle,
   faEye,
+  faGaugeHigh,
   faHome,
   faHouse,
   faMinus,
@@ -68,6 +74,7 @@ library.add(
   faSpinner,
   faStar,
   faTimes,
+  faTableTennisPaddleBall,
   faTrash,
   faTrashAlt,
   faTrophy,
@@ -76,6 +83,7 @@ library.add(
   faUserPlus,
   faUsers,
   faWallet,
+  faServer,
 );
 
 export { FontAwesomeIcon };

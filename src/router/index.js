@@ -7,6 +7,7 @@ const Players = () => import("@/pages/Players.vue");
 const Games = () => import("@/pages/Games.vue");
 const ApiStatus = () => import("@/pages/ApiStatus.vue");
 const Login = () => import("@/pages/Login.vue");
+const Signup = () => import("@/pages/Signup.vue");
 const NotFound = () => import("@/pages/NotFound.vue");
 
 const routes = [
@@ -39,6 +40,12 @@ const routes = [
     name: "Login",
     component: Login,
     meta: { title: `Login • ${appConfig.name}` },
+  },
+  {
+    path: "/signup",
+    name: "Signup",
+    component: Signup,
+    meta: { title: `Sign up • ${appConfig.name}` },
   },
   {
     path: "/:pathMatch(.*)*",

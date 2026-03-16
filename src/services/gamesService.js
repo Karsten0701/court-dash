@@ -5,7 +5,21 @@ import apiService, { BASE_URL } from "./apiService.js";
  */
 class GamesService {
   async listPlannedGames() {
-    return apiService.getGames();
+    const games = await apiService.getGames();
+
+    // Enrich each game with participants by fetching full details
+    const withParticipants = await Promise.all(
+      games.map(async (game) => {
+        try {
+          const full = await apiService.getGameById(game.id);
+          return { ...game, participants: full.participants || [] };
+        } catch {
+          return { ...game, participants: [] };
+        }
+      }),
+    );
+
+    return withParticipants;
   }
 
   async getGameDetails(id) {
@@ -64,12 +78,8 @@ class GamesService {
   }
 
   async deleteGame(gameId) {
-    // Not formally documented; implemented defensively with error handling in UI.
-    const url = `${BASE_URL}/games/${encodeURIComponent(gameId)}`;
-    const response = await apiService.authenticatedFetch(url, {
-      method: "DELETE",
-    });
-    return apiService.handleResponse(response);
+    // Backend does not expose DELETE /games/:id; surface a clear error.
+    throw new Error("Deleting games is not supported by the API");
   }
 }
 
