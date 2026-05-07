@@ -49,16 +49,8 @@ const {
   maxRetries: 1,
 });
 
-const {
-  data: leaderboard,
-  execute: fetchLeaderboard,
-} = useApiRequest(() => playersService.listLeaderboard(), {
-  immediate: true,
-  maxRetries: 1,
-});
-
 const refreshPlayerData = async () => {
-  await Promise.all([fetchPlayers(), fetchLeaderboard()]);
+  await fetchPlayers();
 };
 
 const toast = ref(null);
@@ -80,14 +72,6 @@ const filteredPlayers = computed(() => {
     createdAt: u.createdAt,
   }));
 
-  const leaderboardRows = Array.isArray(leaderboard.value)
-    ? leaderboard.value
-    : leaderboard.value?.players || [];
-
-  const leaderboardRankByUserId = new Map(
-    leaderboardRows.map((entry) => [Number(entry.id), Number(entry.rank)]),
-  );
-
   const rankByUserId = new Map(
     [...basePlayers]
       .sort((a, b) => {
@@ -99,7 +83,7 @@ const filteredPlayers = computed(() => {
 
   let list = basePlayers.map((player) => ({
     ...player,
-    rank: leaderboardRankByUserId.get(Number(player.id)) ?? rankByUserId.get(player.id) ?? 0,
+    rank: rankByUserId.get(player.id) ?? 0,
   }));
 
   if (term) {
