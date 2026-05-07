@@ -7,6 +7,23 @@ class AuthService {
     this.loadUserFromStorage();
   }
 
+  setCurrentUser(user) {
+    this.currentUser = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
+    this.isLoggedIn = true;
+    localStorage.setItem("currentUser", JSON.stringify(this.currentUser));
+  }
+
+  clearSession() {
+    this.currentUser = null;
+    this.isLoggedIn = false;
+    localStorage.removeItem("currentUser");
+  }
+
   /**
    * Load user data from localStorage if available
    *
@@ -43,20 +60,12 @@ class AuthService {
         throw new Error("Login response missing user data.");
       }
 
-      this.currentUser = {
-        id: response.user.id,
-        email: response.user.email,
-        name: response.user.name,
-        role: response.user.role,
-      };
-
-      this.isLoggedIn = true;
-      localStorage.setItem("currentUser", JSON.stringify(this.currentUser));
+      this.setCurrentUser(response.user);
 
       return response;
     } catch (error) {
       console.error("Login failed:", error);
-      this.isLoggedIn = false;
+      this.clearSession();
       throw error;
     }
   }
@@ -72,16 +81,12 @@ class AuthService {
   async logout() {
     try {
       await apiService.logout();
-      this.currentUser = null;
-      this.isLoggedIn = false;
-      localStorage.removeItem("currentUser");
+      this.clearSession();
       return { message: "Logged out successfully" };
     } catch (error) {
       console.error("Logout error:", error);
       // Clear local data even if API call fails
-      this.currentUser = null;
-      this.isLoggedIn = false;
-      localStorage.removeItem("currentUser");
+      this.clearSession();
       throw error;
     }
   }
@@ -98,6 +103,10 @@ class AuthService {
     return this.isLoggedIn && this.currentUser !== null;
   }
 
+  isAdmin() {
+    return this.currentUser?.role === "admin";
+  }
+
   /**
    * Check if user is logged in with JWT token validation.
    * Attempts to validate token, refresh if needed, or redirect to login.
@@ -108,38 +117,19 @@ class AuthService {
    * @throws {Error} - If there is an error during token validation or refresh, it will be caught and logged, and the function will return false to indicate the user is not authenticated.
    */
   async isLoggedInWithTokenCheck() {
-    // Check if we have user data
-    if (!this.isAuthenticated()) {
-      return false;
-    }
-
-    // Try to verify authentication with the server
     try {
-      // Attempt to get current user (this will use the JWT token)
-      const isValid = await this.verifyAuthentication();
-      if (isValid) {
-        return true;
-      }
+      return await this.verifyAuthentication();
     } catch (error) {
-      // Token might be expired, try to refresh
-      console.log("Token validation failed, attempting refresh...");
-      try {
-        await this.refreshToken();
-        // Try verification again after refresh
-        const isValid = await this.verifyAuthentication();
-        if (isValid) {
-          return true;
-        }
-      } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
-      }
+      console.error("Token validation failed:", error);
     }
 
-    // All attempts failed, clear local state
-    this.currentUser = null;
-    this.isLoggedIn = false;
-    localStorage.removeItem("currentUser");
+    this.clearSession();
     return false;
+  }
+
+  async requireAdminSession() {
+    const authenticated = await this.isLoggedInWithTokenCheck();
+    return authenticated && this.isAdmin();
   }
 
   /**
@@ -157,20 +147,10 @@ class AuthService {
       const userData = await apiService.getProfile();
 
       if (userData && userData.id) {
-        // Update local state with fresh data
-        this.currentUser = {
-          id: userData.id,
-          email: userData.email,
-          name: userData.name,
-          role: userData.role,
-        };
-        this.isLoggedIn = true;
-        localStorage.setItem("currentUser", JSON.stringify(this.currentUser));
+        this.setCurrentUser(userData);
         return true;
       } else {
-        this.isLoggedIn = false;
-        this.currentUser = null;
-        localStorage.removeItem("currentUser");
+        this.clearSession();
         return false;
       }
     } catch (error) {
@@ -204,7 +184,7 @@ class AuthService {
       return await apiService.refreshAccessToken();
     } catch (error) {
       console.error("Token refresh failed:", error);
-      await this.logout();
+      this.clearSession();
       throw error;
     }
   }

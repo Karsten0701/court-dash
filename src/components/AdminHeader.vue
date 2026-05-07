@@ -8,17 +8,23 @@ const route = useRoute();
 const router = useRouter();
 
 const tabs = [
-  { to: "/", label: "Overview", name: "Dashboard", icon: "gauge-high" },
+  { to: "/", label: "Overview", name: "Dashboard", icon: "house" },
   { to: "/players", label: "Players", name: "Players", icon: "users" },
   { to: "/games", label: "Games", name: "Games", icon: "table-tennis-paddle-ball" },
-  { to: "/status", label: "API Status", name: "ApiStatus", icon: "server" },
+  { to: "/status", label: "API", name: "ApiStatus", icon: "server" },
 ];
 
 const activeTabName = computed(() => route.name);
+const currentUser = computed(() => authService.getCurrentUser());
+const userInitial = computed(() =>
+  (currentUser.value?.name || currentUser.value?.email || "A")
+    .charAt(0)
+    .toUpperCase(),
+);
 
 const pageTitle = computed(() => {
-  if (route.meta?.title) return route.meta.title;
   if (route.name === "Dashboard") return "Overview";
+  if (route.name === "ApiStatus") return "API Status";
   return route.name || "Dashboard";
 });
 
@@ -33,39 +39,39 @@ const handleLogout = async () => {
 
 <template>
   <header
-    class="sticky top-0 z-40 border-b border-asphalt-light bg-charcoal/95 backdrop-blur"
+    class="sticky top-0 z-40 border-b border-asphalt-light bg-court/95 backdrop-blur"
   >
     <div
-      class="max-w-7xl mx-auto px-4 lg:px-8 py-3 lg:py-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+      class="max-w-7xl mx-auto px-4 lg:px-8 py-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
     >
-      <div class="flex items-center gap-3">
+      <div class="flex items-center justify-between gap-3">
         <div
-          class="flex h-9 w-9 items-center justify-center rounded-md bg-racket text-snow shadow-md"
+          class="flex h-9 w-9 items-center justify-center rounded-lg bg-racket text-snow"
         >
-          <font-awesome-icon icon="table-tennis-paddle-ball" class="text-lg" />
+          <font-awesome-icon icon="table-tennis-paddle-ball" />
         </div>
         <div>
-          <p class="text-xs uppercase tracking-wide text-asphalt-muted">
+          <p class="text-sm font-semibold leading-tight text-snow">
             {{ appConfig.name }}
           </p>
-          <h1 class="text-lg font-semibold leading-tight text-snow">
+          <p class="text-xs text-asphalt-muted">
             {{ pageTitle }}
-          </h1>
+          </p>
         </div>
       </div>
 
-      <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center justify-between gap-3">
         <nav
-          class="flex flex-1 justify-center lg:justify-end gap-1 rounded-full bg-asphalt px-1 py-1 text-xs lg:text-sm"
+          class="flex flex-1 justify-start lg:justify-end gap-1 text-sm"
           aria-label="Main navigation"
         >
           <router-link
             v-for="tab in tabs"
             :key="tab.to"
             :to="tab.to"
-            class="inline-flex items-center gap-1.5 lg:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full transition-all duration-150 text-snow-dim hover:text-snow"
+            class="inline-flex items-center gap-2 rounded-md border border-transparent px-3 py-2 font-medium text-snow hover:bg-asphalt"
             :class="{
-              'bg-racket text-snow shadow-sm': tab.name === activeTabName,
+              'border-asphalt-light bg-asphalt text-snow': tab.name === activeTabName,
             }"
           >
             <font-awesome-icon :icon="tab.icon" class="text-[11px] lg:text-xs" />
@@ -75,16 +81,18 @@ const handleLogout = async () => {
 
         <button
           type="button"
-          class="hidden sm:inline-flex items-center gap-2 rounded-full bg-asphalt px-3 py-1.5 text-xs hover:bg-asphalt-light"
+          class="hidden sm:inline-flex items-center gap-2 rounded-md border border-asphalt-light px-3 py-2 text-xs text-snow hover:bg-asphalt"
           @click="handleLogout"
         >
           <span
-            class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-turf text-snow text-[11px] font-semibold"
+            class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-turf text-snow text-[11px] font-semibold"
           >
-            A
+            {{ userInitial }}
           </span>
           <div class="leading-tight text-left">
-            <p class="font-medium text-snow text-xs">Admin</p>
+            <p class="font-medium text-snow text-xs">
+              {{ currentUser?.name || "Admin" }}
+            </p>
             <p class="text-[10px] text-asphalt-muted">Logout</p>
           </div>
         </button>

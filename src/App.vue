@@ -1,10 +1,12 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import AdminHeader from "./components/AdminHeader.vue";
 
+const route = useRoute();
 const router = useRouter();
 const isInitialLoad = ref(true);
+const showAdminShell = computed(() => route.meta.requiresAuth);
 
 router.isReady().then(() => {
   setTimeout(() => {
@@ -15,9 +17,13 @@ router.isReady().then(() => {
 
 <template>
   <div class="min-h-screen bg-court text-snow">
-    <AdminHeader />
+    <AdminHeader v-if="showAdminShell" />
 
-    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-10">
+    <main
+      :class="showAdminShell
+        ? 'max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-10'
+        : 'min-h-screen'"
+    >
       <router-view v-slot="{ Component, route }">
         <Transition :name="isInitialLoad ? '' : 'page'" mode="out-in">
           <component :is="Component" :key="route.path" />

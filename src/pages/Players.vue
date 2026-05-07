@@ -7,6 +7,7 @@ import ErrorMessage from "@/components/ErrorMessage.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import FormInput from "@/components/FormInput.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import { formatDate } from "@/utils/formatters.js";
 
 const search = ref("");
 const sortBy = ref("elo");
@@ -28,6 +29,7 @@ const createForm = ref({
 const editForm = ref({
   email: "",
   username: "",
+  role: "user",
 });
 
 const {
@@ -39,14 +41,6 @@ const {
   immediate: true,
   maxRetries: 1,
 });
-
-const {
-  execute: searchPlayers,
-  loading: searching,
-} = useApiRequest(
-  (term) => playersService.searchPlayers(term),
-  { immediate: false, maxRetries: 1 },
-);
 
 const toast = ref(null);
 const showToast = (type, message) => {
@@ -62,13 +56,17 @@ const filteredPlayers = computed(() => {
     id: u.id,
     name: u.name,
     email: u.email,
+    role: u.role || "user",
     elo: u.elo ?? 1000,
+    createdAt: u.createdAt,
     rank: index + 1,
   }));
 
   if (term) {
     list = list.filter((p) =>
-      p.name?.toLowerCase().includes(term),
+      [p.name, p.email, p.role].some((value) =>
+        value?.toLowerCase().includes(term),
+      ),
     );
   }
 
@@ -126,8 +124,9 @@ const submitCreate = async () => {
 const openEditModal = async (player) => {
   selectedPlayer.value = player;
   editForm.value = {
-    email: "",
+    email: player.email || "",
     username: player.name,
+    role: player.role || "user",
   };
   showEditModal.value = true;
 };
@@ -138,6 +137,7 @@ const submitEdit = async () => {
     await playersService.updatePlayer(selectedPlayer.value.id, {
       email: editForm.value.email || undefined,
       username: editForm.value.username || undefined,
+      role: editForm.value.role || undefined,
     });
     showEditModal.value = false;
     showToast("success", "Player updated");
@@ -173,7 +173,7 @@ const confirmDelete = async () => {
           Players
         </p>
         <p class="text-sm text-snow-dim">
-          Manage players, update details, and maintain the leaderboard.
+          Manage accounts, roles, and leaderboard data.
         </p>
       </div>
       <div class="flex items-center gap-2">
@@ -203,7 +203,7 @@ const confirmDelete = async () => {
             id="player-search"
             v-model="search"
             label="Search players"
-            placeholder="Search by name"
+            placeholder="Search by name, email, or role"
           />
         </div>
 
@@ -271,7 +271,16 @@ const confirmDelete = async () => {
                   Name
                 </th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-asphalt-muted">
+                  Email
+                </th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-asphalt-muted">
+                  Role
+                </th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-asphalt-muted">
                   ELO
+                </th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-asphalt-muted">
+                  Created
                 </th>
                 <th class="px-4 py-2 text-right text-xs font-medium text-asphalt-muted">
                   Actions
@@ -286,8 +295,22 @@ const confirmDelete = async () => {
                 <td class="px-4 py-2 text-snow">
                   {{ player.name }}
                 </td>
+                <td class="px-4 py-2 text-snow-dim">
+                  {{ player.email || "-" }}
+                </td>
+                <td class="px-4 py-2">
+                  <span
+                    class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+                    :class="player.role === 'admin' ? 'bg-racket/20 text-racket' : 'bg-asphalt text-snow-dim'"
+                  >
+                    {{ player.role }}
+                  </span>
+                </td>
                 <td class="px-4 py-2 text-snow-dim tabular-nums">
                   {{ player.elo }}
+                </td>
+                <td class="px-4 py-2 text-snow-dim whitespace-nowrap">
+                  {{ formatDate(player.createdAt) || "-" }}
                 </td>
                 <td class="px-4 py-2 text-right">
                   <div class="inline-flex items-center gap-2 text-xs">
@@ -420,6 +443,19 @@ const confirmDelete = async () => {
             label="Email"
             type="email"
           />
+          <div>
+            <label for="edit-role" class="block text-sm font-medium text-snow">
+              Role
+            </label>
+            <select
+              id="edit-role"
+              v-model="editForm.role"
+              class="mt-1 block w-full rounded-md border border-asphalt-light bg-asphalt px-3 py-2 text-snow shadow-sm focus:border-racket focus:outline-none focus:ring-racket"
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
         </div>
         <div class="mt-5 flex justify-end gap-2 text-xs">
           <button

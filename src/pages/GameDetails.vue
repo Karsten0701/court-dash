@@ -32,7 +32,7 @@ const statusConfig = {
     text: "text-status-delivering",
   },
   processed: {
-    label: "Ended",
+    label: "Processed",
     bg: "bg-status-processed/20",
     text: "text-status-processed",
   },

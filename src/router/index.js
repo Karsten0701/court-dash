@@ -7,33 +7,38 @@ const Players = () => import("@/pages/Players.vue");
 const Games = () => import("@/pages/Games.vue");
 const ApiStatus = () => import("@/pages/ApiStatus.vue");
 const Login = () => import("@/pages/Login.vue");
-const Signup = () => import("@/pages/Signup.vue");
 const NotFound = () => import("@/pages/NotFound.vue");
+
+const adminMeta = (title) => ({
+  title,
+  requiresAuth: true,
+  requiresAdmin: true,
+});
 
 const routes = [
   {
     path: "/",
     name: "Dashboard",
     component: Dashboard,
-    meta: { title: `Overview • ${appConfig.name}`, requiresAuth: true },
+    meta: adminMeta(`Overview • ${appConfig.name}`),
   },
   {
     path: "/players",
     name: "Players",
     component: Players,
-    meta: { title: `Players • ${appConfig.name}`, requiresAuth: true },
+    meta: adminMeta(`Players • ${appConfig.name}`),
   },
   {
     path: "/games",
     name: "Games",
     component: Games,
-    meta: { title: `Games • ${appConfig.name}`, requiresAuth: true },
+    meta: adminMeta(`Games • ${appConfig.name}`),
   },
   {
     path: "/status",
     name: "ApiStatus",
     component: ApiStatus,
-    meta: { title: `API Status • ${appConfig.name}`, requiresAuth: true },
+    meta: adminMeta(`API Status • ${appConfig.name}`),
   },
   {
     path: "/login",
@@ -44,8 +49,8 @@ const routes = [
   {
     path: "/signup",
     name: "Signup",
-    component: Signup,
-    meta: { title: `Sign up • ${appConfig.name}` },
+    redirect: { name: "Login" },
+    meta: { title: `Login • ${appConfig.name}` },
   },
   {
     path: "/:pathMatch(.*)*",
@@ -63,26 +68,38 @@ const router = createRouter({
   },
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   document.title = to.meta.title || appConfig.name;
 
-  // Check if the route requires authentication
   if (to.meta.requiresAuth) {
-    // Only check if user data exists in localStorage (not validating token)
-    // Token validation happens via HTTP-only cookies on API calls
-    if (!authService.isAuthenticated()) {
-      // No user data, redirect to login
+    const hasSession = await authService.isLoggedInWithTokenCheck();
+
+    if (!hasSession) {
       next({
         name: "Login",
         query: { redirect: to.fullPath },
       });
       return;
     }
+
+    if (to.meta.requiresAdmin && !authService.isAdmin()) {
+      await authService.logout().catch(() => {});
+      next({
+        name: "Login",
+        query: { reason: "admin", redirect: to.fullPath },
+      });
+      return;
+    }
   }
 
-  // If going to login page and already logged in, redirect to account or intended destination
   if (to.name === "Login" && authService.isAuthenticated()) {
-    const redirectTo = to.query.redirect || "/account";
+    if (!authService.isAdmin()) {
+      await authService.logout().catch(() => {});
+      next();
+      return;
+    }
+
+    const redirectTo = to.query.redirect || "/";
     next(redirectTo);
     return;
   }

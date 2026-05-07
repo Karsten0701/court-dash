@@ -24,11 +24,12 @@ const handleLogin = async () => {
   try {
     await authService.login(email.value, password.value);
 
-    // Trigger unpaid orders check
-    localStorage.removeItem("lastUnpaidOrderCheck");
-    window.dispatchEvent(new Event("unpaidOrdersUpdated"));
+    if (!authService.isAdmin()) {
+      await authService.logout().catch(() => {});
+      error.value = "This dashboard is only available to admin accounts.";
+      return;
+    }
 
-    // Redirect to the page they tried to access or home
     const redirectTo = router.currentRoute.value.query.redirect || "/";
     router.push(redirectTo);
   } catch (err) {
@@ -59,16 +60,30 @@ const handleLogin = async () => {
 
 <template>
   <div
-    class="min-h-[calc(100dvh-var(--nav-h))] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+    class="min-h-screen flex items-center justify-center px-4 py-10"
   >
-    <div class="max-w-md w-full space-y-8">
-      <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-snow">
-          Sign in to your account
-        </h2>
+    <div class="w-full max-w-sm">
+      <div class="mb-8 text-center">
+        <div
+          class="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-racket text-white shadow-lg"
+        >
+          <font-awesome-icon icon="table-tennis-paddle-ball" />
+        </div>
+        <p class="text-xs uppercase tracking-[0.24em] text-asphalt-muted">
+          King of the Court
+        </p>
+        <h1 class="mt-2 text-2xl font-semibold text-snow">
+          Admin login
+        </h1>
+        <p class="mt-2 text-sm text-snow-dim">
+          Sign in with an admin account to manage players and games.
+        </p>
       </div>
 
-      <form class="mt-4 space-y-6" @submit.prevent="handleLogin">
+      <form
+        class="rounded-2xl border border-asphalt-light bg-charcoal p-5 shadow-xl space-y-5"
+        @submit.prevent="handleLogin"
+      >
         <div class="space-y-4">
           <FormInput
             id="email"
@@ -97,27 +112,15 @@ const handleLogin = async () => {
           :hint="error"
         />
 
-        <div class="space-y-3">
-          <button
-            type="submit"
-            :disabled="isLoading"
-            class="group relative w-full flex items-center justify-center gap-2 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-racket hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <LoadingSpinner v-if="isLoading" class="text-white" />
-            <font-awesome-icon v-else icon="sign-in-alt" />
-            <span>{{ isLoading ? "Signing in..." : "Sign in" }}</span>
-          </button>
-
-          <p class="text-center text-sm text-snow-dim">
-            Or
-            <router-link
-              to="/signup"
-              class="font-medium text-racket hover:text-racket-hover"
-            >
-              create a new account
-            </router-link>
-          </p>
-        </div>
+        <button
+          type="submit"
+          :disabled="isLoading"
+          class="group relative w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-racket hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-racket disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <LoadingSpinner v-if="isLoading" class="text-white" />
+          <font-awesome-icon v-else icon="sign-in-alt" />
+          <span>{{ isLoading ? "Signing in..." : "Sign in" }}</span>
+        </button>
       </form>
     </div>
   </div>

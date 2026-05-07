@@ -38,11 +38,22 @@ class ApiService {
         .json()
         .catch(() => ({ message: response.statusText }));
 
-      // Create error with status code included
+      const validationDetails = Array.isArray(error.errors)
+        ? error.errors
+            .map((item) =>
+              item.field ? `${item.field}: ${item.message}` : item.message,
+            )
+            .filter(Boolean)
+            .join("; ")
+        : "";
       const errorMessage =
-        error.message || `HTTP error! status: ${response.status}`;
+        response.status === 403
+          ? "Admin permission required. Log in with an admin account."
+          : [error.message, validationDetails].filter(Boolean).join(" - ") ||
+            `HTTP error! status: ${response.status}`;
       const err = new Error(errorMessage);
       err.status = response.status;
+      err.details = error.errors || null;
       throw err;
     }
 
@@ -185,6 +196,7 @@ class ApiService {
   async getGames() {
     const response = await fetch(`${this.baseURL}/games`, {
       method: "GET",
+      credentials: "include",
       headers: this.getHeaders(),
     });
 
@@ -202,6 +214,17 @@ class ApiService {
   async getGameById(id) {
     const response = await this.authenticatedFetch(
       `${this.baseURL}/games/${id}`,
+      {
+        method: "GET",
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
+  async getGameSchedule(id) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${encodeURIComponent(id)}/schedule`,
       {
         method: "GET",
       },
@@ -265,6 +288,66 @@ class ApiService {
       `${this.baseURL}/games/${id}/leave`,
       {
         method: "POST",
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
+  async signupUserForGame(gameId, userId) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${encodeURIComponent(
+        gameId,
+      )}/signup/${encodeURIComponent(userId)}`,
+      {
+        method: "POST",
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
+  async removeUserFromGame(gameId, userId) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${encodeURIComponent(
+        gameId,
+      )}/leave/${encodeURIComponent(userId)}`,
+      {
+        method: "POST",
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
+  async startGame(gameId) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${encodeURIComponent(gameId)}/start`,
+      {
+        method: "PUT",
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
+  async endGame(gameId) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${encodeURIComponent(gameId)}/end`,
+      {
+        method: "PUT",
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
+  async processGame(gameId, payload) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${encodeURIComponent(gameId)}/process`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload),
       },
     );
 
@@ -363,6 +446,7 @@ class ApiService {
   async getLeaderboard() {
     const response = await fetch(`${this.baseURL}/player/leaderboard`, {
       method: "GET",
+      credentials: "include",
       headers: this.getHeaders(),
     });
 
@@ -438,6 +522,7 @@ class ApiService {
   async registerUser(userData) {
     const response = await fetch(`${this.baseURL}/users`, {
       method: "POST",
+      credentials: "include",
       headers: this.getHeaders(),
       body: JSON.stringify(userData),
     });
