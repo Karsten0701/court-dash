@@ -49,6 +49,18 @@ const {
   maxRetries: 1,
 });
 
+const {
+  data: leaderboard,
+  execute: fetchLeaderboard,
+} = useApiRequest(() => playersService.listLeaderboard(), {
+  immediate: true,
+  maxRetries: 1,
+});
+
+const refreshPlayerData = async () => {
+  await Promise.all([fetchPlayers(), fetchLeaderboard()]);
+};
+
 const toast = ref(null);
 const showToast = (type, message) => {
   toast.value = { type, message };
@@ -68,6 +80,14 @@ const filteredPlayers = computed(() => {
     createdAt: u.createdAt,
   }));
 
+  const leaderboardRows = Array.isArray(leaderboard.value)
+    ? leaderboard.value
+    : leaderboard.value?.players || [];
+
+  const leaderboardRankByUserId = new Map(
+    leaderboardRows.map((entry) => [Number(entry.id), Number(entry.rank)]),
+  );
+
   const rankByUserId = new Map(
     [...basePlayers]
       .sort((a, b) => {
@@ -79,7 +99,7 @@ const filteredPlayers = computed(() => {
 
   let list = basePlayers.map((player) => ({
     ...player,
-    rank: rankByUserId.get(player.id) ?? 0,
+    rank: leaderboardRankByUserId.get(Number(player.id)) ?? rankByUserId.get(player.id) ?? 0,
   }));
 
   if (term) {
@@ -132,7 +152,7 @@ const submitCreate = async () => {
     await playersService.createPlayer(createForm.value);
     showCreateModal.value = false;
     showToast("success", "Player created");
-    await fetchPlayers();
+    await refreshPlayerData();
   } catch (err) {
     showToast("error", err.message || "Failed to create player");
   }
@@ -159,7 +179,7 @@ const submitEdit = async () => {
 
     showEditModal.value = false;
     showToast("success", "Player updated");
-    await fetchPlayers();
+    await refreshPlayerData();
   } catch (err) {
     showToast("error", err.message || "Failed to update player");
   }
@@ -220,7 +240,7 @@ const confirmDelete = async () => {
     await playersService.deletePlayer(selectedPlayer.value.id);
     showDeleteModal.value = false;
     showToast("success", "Player deleted");
-    await fetchPlayers();
+    await refreshPlayerData();
   } catch (err) {
     showToast("error", err.message || "Failed to delete player");
   }
@@ -299,7 +319,7 @@ const confirmDelete = async () => {
         :title="'Failed to load players'"
         :message="error.message"
         retry-label="Retry"
-        @retry="fetchPlayers"
+        @retry="refreshPlayerData"
       />
 
       <div v-else>
