@@ -98,9 +98,6 @@ const filteredPlayers = computed(() => {
     if (sortBy.value === "name") {
       return a.name.localeCompare(b.name) * dir;
     }
-    if (sortBy.value === "rank") {
-      return (a.rank - b.rank) * dir;
-    }
     return 0;
   });
 
@@ -289,14 +286,6 @@ const confirmDelete = async () => {
             @click="setSort('name')"
           >
             Name
-          </button>
-          <button
-            type="button"
-            class="rounded-full px-3 py-1 border border-asphalt-light"
-            :class="sortBy === 'rank' ? 'bg-asphalt text-snow' : 'text-snow-dim'"
-            @click="setSort('rank')"
-          >
-            Rank
           </button>
         </div>
       </div>
