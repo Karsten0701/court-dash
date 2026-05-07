@@ -37,6 +37,7 @@ const editForm = ref({
   email: "",
   username: "",
   role: "user",
+  elo: 1000,
 });
 
 const {
@@ -148,6 +149,7 @@ const openEditModal = async (player) => {
     email: player.email || "",
     username: player.name,
     role: player.role || "user",
+    elo: player.elo ?? 1000,
   };
   showEditModal.value = true;
 };
@@ -155,10 +157,12 @@ const openEditModal = async (player) => {
 const submitEdit = async () => {
   if (!selectedPlayer.value) return;
   try {
+    const parsedElo = Number(editForm.value.elo);
     await playersService.updatePlayer(selectedPlayer.value.id, {
       email: editForm.value.email || undefined,
       username: editForm.value.username || undefined,
       role: editForm.value.role || undefined,
+      elo: Number.isFinite(parsedElo) ? parsedElo : undefined,
     });
 
     showEditModal.value = false;
@@ -522,6 +526,13 @@ const confirmDelete = async () => {
               <option value="admin">Admin</option>
             </select>
           </div>
+          <FormInput
+            id="edit-elo"
+            v-model="editForm.elo"
+            label="ELO"
+            type="number"
+            min="0"
+          />
         </div>
         <div class="mt-5 flex justify-end gap-2 text-xs">
           <button
