@@ -147,20 +147,7 @@ const submitCreate = async () => {
       description: createForm.value.description || undefined,
       ...(plannedAt ? { plannedAt } : {}),
     };
-    try {
-      await gamesService.createGame(payload);
-    } catch (err) {
-      const isDateError = /date|time|plannedAt|planned/i.test(err.message || "");
-      if (!payload.plannedAt || !isDateError) throw err;
-      await gamesService.createGame({
-        name: payload.name,
-        description: payload.description,
-      });
-      showToast("success", "Game created without planned date");
-      showCreateModal.value = false;
-      await refreshAllGames();
-      return;
-    }
+    await gamesService.createGame(payload);
     showCreateModal.value = false;
     showToast("success", "Game created");
     await refreshAllGames();
@@ -270,6 +257,30 @@ const processForm = ref({
   scores: [],
 });
 
+const getNumericScore = (value) => {
+  if (value === "" || value == null) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const syncWinnerWithScores = () => {
+  const scored = processForm.value.scores
+    .map((score) => ({
+      userId: Number(score.userId),
+      score: getNumericScore(score.score),
+    }))
+    .filter((entry) => entry.score != null);
+
+  if (!scored.length) return;
+
+  const maxScore = Math.max(...scored.map((entry) => entry.score));
+  const leaders = scored.filter((entry) => entry.score === maxScore);
+  const currentWinnerId = Number(processForm.value.winnerId);
+
+  if (leaders.some((entry) => entry.userId === currentWinnerId)) return;
+  processForm.value.winnerId = String(leaders[0].userId);
+};
+
 const openProcessModal = (game) => {
   const participants = game.participants || [];
   if (processCloseTimer) {
@@ -279,13 +290,14 @@ const openProcessModal = (game) => {
   processResult.value = null;
   processForm.value = {
     game,
-    winnerId: participants[0]?.userId ? String(participants[0].userId) : "",
+    winnerId: "",
     scores: participants.map((participant) => ({
       userId: participant.userId,
       username: participant.username,
       score: "",
     })),
   };
+  syncWinnerWithScores();
   showProcessModal.value = true;
 };
 
@@ -326,6 +338,7 @@ const submitProcessGame = async () => {
 
   try {
     processingGame.value = true;
+    syncWinnerWithScores();
     if (!processForm.value.winnerId) {
       showToast("error", "Select a winner before processing");
       return;
@@ -896,6 +909,7 @@ onMounted(() => {
                 required
                 class="rounded-md border border-asphalt-light bg-asphalt px-3 py-2 text-sm text-snow focus:border-racket focus:outline-none"
                 placeholder="0"
+                @input="syncWinnerWithScores"
               />
             </div>
           </div>
