@@ -59,14 +59,27 @@ const showToast = (type, message) => {
 
 const filteredPlayers = computed(() => {
   const term = search.value.trim().toLowerCase();
-  let list = (users.value || []).map((u, index) => ({
+  const basePlayers = (users.value || []).map((u) => ({
     id: u.id,
     name: u.name,
     email: u.email,
     role: u.role || "user",
     elo: u.elo ?? 1000,
     createdAt: u.createdAt,
-    rank: index + 1,
+  }));
+
+  const rankByUserId = new Map(
+    [...basePlayers]
+      .sort((a, b) => {
+        if (b.elo !== a.elo) return b.elo - a.elo;
+        return (a.name || "").localeCompare(b.name || "");
+      })
+      .map((player, index) => [player.id, index + 1]),
+  );
+
+  let list = basePlayers.map((player) => ({
+    ...player,
+    rank: rankByUserId.get(player.id) ?? 0,
   }));
 
   if (term) {
