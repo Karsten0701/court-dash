@@ -11,7 +11,6 @@ const tabs = [
   { to: "/", label: "Overview", name: "Dashboard", icon: "house" },
   { to: "/players", label: "Players", name: "Players", icon: "users" },
   { to: "/games", label: "Games", name: "Games", icon: "table-tennis-paddle-ball" },
-  { to: "/status", label: "API", name: "ApiStatus", icon: "server" },
 ];
 
 const activeTabName = computed(() => route.name);
@@ -24,7 +23,6 @@ const userInitial = computed(() =>
 
 const pageTitle = computed(() => {
   if (route.name === "Dashboard") return "Overview";
-  if (route.name === "ApiStatus") return "API Status";
   return route.name || "Dashboard";
 });
 

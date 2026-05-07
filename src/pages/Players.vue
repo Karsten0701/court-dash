@@ -1,6 +1,8 @@
 <script setup>
 import { computed, ref } from "vue";
 import playersService from "@/services/playersService.js";
+import gamesService from "@/services/gamesService.js";
+import apiService from "@/services/apiService.js";
 import { useApiRequest } from "@/composables/useApiRequest.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
@@ -18,7 +20,12 @@ const pageSize = ref(10);
 const showCreateModal = ref(false);
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
+const showHistoryModal = ref(false);
 const selectedPlayer = ref(null);
+const historyLoading = ref(false);
+const historyError = ref("");
+const selectedPlayerEloHistory = ref(null);
+const selectedPlayerGames = ref([]);
 
 const createForm = ref({
   email: "",
@@ -139,11 +146,56 @@ const submitEdit = async () => {
       username: editForm.value.username || undefined,
       role: editForm.value.role || undefined,
     });
+
     showEditModal.value = false;
     showToast("success", "Player updated");
     await fetchPlayers();
   } catch (err) {
     showToast("error", err.message || "Failed to update player");
+  }
+};
+
+const openHistoryModal = async (player) => {
+  selectedPlayer.value = player;
+  showHistoryModal.value = true;
+  historyLoading.value = true;
+  historyError.value = "";
+  selectedPlayerEloHistory.value = null;
+  selectedPlayerGames.value = [];
+
+  try {
+    const [eloHistory, games] = await Promise.all([
+      apiService.getHistoricalEloByUserId(player.id),
+      gamesService.listAdminGames(),
+    ]);
+
+    const gamesForPlayer = (games || [])
+      .filter((game) =>
+        (game.participants || []).some(
+          (participant) => Number(participant.userId) === Number(player.id),
+        ),
+      )
+      .map((game) => {
+        const participant = (game.participants || []).find(
+          (entry) => Number(entry.userId) === Number(player.id),
+        );
+        return {
+          ...game,
+          userScore: participant?.score ?? null,
+        };
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.endedAt || b.startedAt || b.createdAt || 0) -
+          new Date(a.endedAt || a.startedAt || a.createdAt || 0),
+      );
+
+    selectedPlayerEloHistory.value = eloHistory;
+    selectedPlayerGames.value = gamesForPlayer;
+  } catch (err) {
+    historyError.value = err.message || "Failed to load player history";
+  } finally {
+    historyLoading.value = false;
   }
 };
 
@@ -317,6 +369,14 @@ const confirmDelete = async () => {
                     <button
                       type="button"
                       class="inline-flex items-center gap-1 rounded bg-asphalt px-2 py-1 text-snow hover:bg-asphalt-light"
+                      @click="openHistoryModal(player)"
+                    >
+                      <font-awesome-icon icon="chart-line" />
+                      History
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-1 rounded bg-asphalt px-2 py-1 text-snow hover:bg-asphalt-light"
                       @click="openEditModal(player)"
                     >
                       <font-awesome-icon icon="pen" />
@@ -472,6 +532,93 @@ const confirmDelete = async () => {
           >
             <font-awesome-icon icon="check" />
             Save changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Player history modal -->
+    <div
+      v-if="showHistoryModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-court/80"
+      @click.self="showHistoryModal = false"
+    >
+      <div class="w-full max-w-3xl rounded-lg bg-charcoal p-5 border border-asphalt-light max-h-[85vh] overflow-y-auto">
+        <h3 class="text-lg font-semibold text-snow mb-4">
+          {{ selectedPlayer?.name }} - History
+        </h3>
+
+        <div v-if="historyLoading" class="py-12 flex justify-center">
+          <LoadingSpinner size="6" />
+        </div>
+
+        <ErrorMessage
+          v-else-if="historyError"
+          :title="'Failed to load history'"
+          :message="historyError"
+        />
+
+        <div v-else class="space-y-5">
+          <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+            <p class="text-xs uppercase tracking-wide text-asphalt-muted">Current ELO</p>
+            <p class="mt-1 text-2xl font-semibold text-snow tabular-nums">
+              {{ selectedPlayerEloHistory?.currentElo ?? selectedPlayer?.elo ?? 1000 }}
+            </p>
+          </div>
+
+          <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+            <p class="text-sm font-semibold text-snow mb-3">Historical ELO</p>
+            <div v-if="!(selectedPlayerEloHistory?.history || []).length" class="text-sm text-snow-dim">
+              No ELO history entries yet.
+            </div>
+            <ul v-else class="space-y-2 text-sm">
+              <li
+                v-for="entry in selectedPlayerEloHistory.history"
+                :key="entry.id"
+                class="flex items-center justify-between rounded bg-charcoal px-3 py-2"
+              >
+                <div>
+                  <p class="text-snow">{{ entry.gameName || `Game #${entry.gameId}` }}</p>
+                  <p class="text-xs text-snow-dim">{{ formatDate(entry.recordedAt) || "-" }}</p>
+                </div>
+                <p class="font-semibold text-snow tabular-nums">{{ entry.elo }}</p>
+              </li>
+            </ul>
+          </div>
+
+          <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+            <p class="text-sm font-semibold text-snow mb-3">
+              Games ({{ selectedPlayerGames.length }})
+            </p>
+            <div v-if="!selectedPlayerGames.length" class="text-sm text-snow-dim">
+              No games found for this player.
+            </div>
+            <ul v-else class="space-y-2 text-sm">
+              <li
+                v-for="game in selectedPlayerGames"
+                :key="game.id"
+                class="rounded bg-charcoal px-3 py-2"
+              >
+                <div class="flex items-center justify-between gap-3">
+                  <p class="font-medium text-snow">{{ game.name || `Game #${game.id}` }}</p>
+                  <span class="text-xs capitalize text-snow-dim">{{ game.status || "-" }}</span>
+                </div>
+                <p class="text-xs text-snow-dim mt-1">
+                  {{ formatDate(game.endedAt || game.startedAt || game.createdAt) || "-" }}
+                  <span v-if="game.userScore !== null"> • Score: {{ game.userScore }}</span>
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-5 flex justify-end">
+          <button
+            type="button"
+            class="rounded bg-asphalt-light px-3 py-2 text-xs text-snow hover:bg-asphalt"
+            @click="showHistoryModal = false"
+          >
+            Close
           </button>
         </div>
       </div>

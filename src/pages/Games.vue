@@ -1,7 +1,8 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import gamesService from "@/services/gamesService.js";
 import playersService from "@/services/playersService.js";
+import apiService from "@/services/apiService.js";
 import { useApiRequest } from "@/composables/useApiRequest.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
@@ -17,13 +18,16 @@ const processResult = ref(null);
 const actionLoadingByGameId = ref({});
 const processingGame = ref(false);
 let processCloseTimer = null;
+const historyGames = ref([]);
+const historyLoading = ref(false);
+const historyError = ref("");
 
 const {
   data: games,
   loading,
   error,
   execute: fetchGames,
-} = useApiRequest(() => gamesService.listPlannedGames(), {
+} = useApiRequest(() => gamesService.listAllGames(), {
   immediate: true,
   maxRetries: 1,
 });
@@ -69,6 +73,29 @@ const replaceGame = (gameId, patch) => {
   games.value = (games.value || []).map((game) =>
     game.id === gameId ? { ...game, ...patch } : game,
   );
+  historyGames.value = (historyGames.value || []).map((game) =>
+    game.id === gameId ? { ...game, ...patch } : game,
+  );
+};
+
+const fetchHistoryGames = async () => {
+  historyLoading.value = true;
+  historyError.value = "";
+  try {
+    const response = await apiService.getHistoricalGames();
+    const rawGames = response?.games || response || [];
+    historyGames.value = rawGames.filter((game) =>
+      ["ended", "processed"].includes((game.status || "").toLowerCase()),
+    );
+  } catch (err) {
+    historyError.value = err.message || "Failed to load games history";
+  } finally {
+    historyLoading.value = false;
+  }
+};
+
+const refreshAllGames = async () => {
+  await Promise.all([fetchGames(), fetchHistoryGames()]);
 };
 
 const refreshGameDetails = async (gameId) => {
@@ -131,12 +158,12 @@ const submitCreate = async () => {
       });
       showToast("success", "Game created without planned date");
       showCreateModal.value = false;
-      await fetchGames();
+      await refreshAllGames();
       return;
     }
     showCreateModal.value = false;
     showToast("success", "Game created");
-    await fetchGames();
+    await refreshAllGames();
   } catch (err) {
     showToast("error", err.message || "Failed to create game");
   }
@@ -227,6 +254,7 @@ const runLifecycleAction = async (game, action) => {
     const updated = await actionMap[action](game.id);
     replaceGame(game.id, updated);
     await refreshGameDetails(game.id).catch(() => {});
+    await fetchHistoryGames();
     showToast("success", `Game ${action === "start" ? "started" : "ended"}`);
   } catch (err) {
     showToast("error", err.message || `Failed to ${action} game`);
@@ -325,6 +353,7 @@ const submitProcessGame = async () => {
       status: "processed",
       winnerUserId: payload.winnerId,
     });
+    await fetchHistoryGames();
     showToast("success", "Game processed");
     processCloseTimer = setTimeout(() => {
       showProcessModal.value = false;
@@ -347,11 +376,23 @@ const statusClasses = (status = "planned") => {
 
 const sortedGames = computed(() =>
   (games.value || []).slice().sort((a, b) => {
-    const aTs = a.plannedAt ? Date.parse(a.plannedAt) : 0;
-    const bTs = b.plannedAt ? Date.parse(b.plannedAt) : 0;
-    return aTs - bTs;
+    const aTs = Date.parse(a.endedAt || a.startedAt || a.plannedAt || a.createdAt || 0);
+    const bTs = Date.parse(b.endedAt || b.startedAt || b.plannedAt || b.createdAt || 0);
+    return bTs - aTs;
   }),
 );
+
+const sortedHistoryGames = computed(() =>
+  (historyGames.value || []).slice().sort((a, b) => {
+    const aTs = Date.parse(a.endedAt || a.startedAt || a.plannedAt || a.createdAt || 0);
+    const bTs = Date.parse(b.endedAt || b.startedAt || b.plannedAt || b.createdAt || 0);
+    return bTs - aTs;
+  }),
+);
+
+onMounted(() => {
+  fetchHistoryGames();
+});
 </script>
 
 <template>
@@ -362,7 +403,7 @@ const sortedGames = computed(() =>
           Games
         </p>
         <p class="text-sm text-snow-dim">
-          Create games, manage players, run the lifecycle, and process scores.
+          Create games, manage players, run lifecycle, and view full game history.
         </p>
       </div>
       <button
@@ -391,7 +432,7 @@ const sortedGames = computed(() =>
         <button
           type="button"
           class="inline-flex items-center gap-2 text-snow-dim hover:text-snow"
-          @click="fetchGames"
+          @click="refreshAllGames"
         >
           <font-awesome-icon icon="arrow-rotate-right" />
           Refresh
@@ -414,8 +455,8 @@ const sortedGames = computed(() =>
         <div v-if="!sortedGames.length">
           <EmptyState
             icon="calendar-days"
-            title="No games planned"
-            message="Create a new game to start planning your next session."
+            title="No games found"
+            message="Create a new game to get started. Ended and processed games show here too."
             action-label="Create game"
             action-icon="plus"
             @action="openCreateModal"
@@ -663,6 +704,90 @@ const sortedGames = computed(() =>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-charcoal rounded-xl border border-asphalt-light p-4 space-y-4">
+      <div class="flex items-center justify-between text-xs text-asphalt-muted">
+        <span>
+          Games History ({{ sortedHistoryGames.length }})
+        </span>
+      </div>
+
+      <div v-if="historyLoading" class="py-12 flex justify-center">
+        <LoadingSpinner size="6" />
+      </div>
+
+      <ErrorMessage
+        v-else-if="historyError"
+        :title="'Failed to load games history'"
+        :message="historyError"
+        retry-label="Retry"
+        @retry="fetchHistoryGames"
+      />
+
+      <div v-else-if="!sortedHistoryGames.length">
+        <EmptyState
+          icon="clipboard-list"
+          title="No historical games yet"
+          message="Ended and processed games appear here."
+        />
+      </div>
+
+      <div v-else class="space-y-3">
+        <div
+          v-for="game in sortedHistoryGames"
+          :key="`history-${game.id}`"
+          class="rounded-lg border border-asphalt-light bg-charcoal overflow-hidden"
+        >
+          <button
+            type="button"
+            class="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-asphalt-light/60"
+            @click="toggleExpand(game)"
+          >
+            <div class="flex items-center gap-3">
+              <font-awesome-icon
+                :icon="expandedGameIds.has(game.id) ? 'chevron-down' : 'chevron-right'"
+                class="text-xs text-asphalt-muted"
+              />
+              <div>
+                <p class="text-sm font-medium text-snow">
+                  {{ game.name || "Unnamed Game" }}
+                </p>
+                <p class="text-xs text-asphalt-muted">
+                  {{ game.description || "No description" }}
+                </p>
+                <p class="mt-1 text-[11px] text-asphalt-muted">
+                  {{ formatDate(game.endedAt || game.startedAt || game.createdAt) || "-" }}
+                </p>
+              </div>
+            </div>
+            <span
+              class="rounded-full px-2 py-0.5 text-xs font-medium capitalize"
+              :class="statusClasses(game.status)"
+            >
+              {{ game.status || "ended" }}
+            </span>
+          </button>
+
+          <div v-if="expandedGameIds.has(game.id)" class="border-t border-asphalt-light p-4">
+            <p class="text-xs uppercase tracking-wide text-asphalt-muted mb-2">
+              Players
+            </p>
+            <ParticipantsList
+              :participants="game.participants || []"
+              :winner-user-id="game.winnerUserId"
+              :show-score="true"
+              display-field="elo"
+            />
+            <p
+              v-if="loadingDetailsFor === game.id"
+              class="mt-3 text-[11px] text-asphalt-muted"
+            >
+              Loading game details...
+            </p>
           </div>
         </div>
       </div>

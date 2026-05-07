@@ -5,7 +5,6 @@ import appConfig from "@/config/appConfig.js";
 const Dashboard = () => import("@/pages/Dashboard.vue");
 const Players = () => import("@/pages/Players.vue");
 const Games = () => import("@/pages/Games.vue");
-const ApiStatus = () => import("@/pages/ApiStatus.vue");
 const Login = () => import("@/pages/Login.vue");
 const NotFound = () => import("@/pages/NotFound.vue");
 
@@ -33,12 +32,6 @@ const routes = [
     name: "Games",
     component: Games,
     meta: adminMeta(`Games • ${appConfig.name}`),
-  },
-  {
-    path: "/status",
-    name: "ApiStatus",
-    component: ApiStatus,
-    meta: adminMeta(`API Status • ${appConfig.name}`),
   },
   {
     path: "/login",
