@@ -37,14 +37,14 @@ const handleLogout = async () => {
 
 <template>
   <header
-    class="sticky top-0 z-40 border-b border-asphalt-light bg-court/95 backdrop-blur"
+    class="sticky top-0 z-40 border-b border-white/5 bg-court/80 backdrop-blur-xl"
   >
     <div
       class="max-w-7xl mx-auto px-4 lg:px-8 py-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
     >
       <div class="flex items-center justify-between gap-3">
         <div
-          class="flex h-9 w-9 items-center justify-center rounded-lg bg-racket text-snow"
+          class="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-grad text-white shadow-glow-sm"
         >
           <font-awesome-icon icon="table-tennis-paddle-ball" />
         </div>
@@ -67,9 +67,9 @@ const handleLogout = async () => {
             v-for="tab in tabs"
             :key="tab.to"
             :to="tab.to"
-            class="inline-flex items-center gap-2 rounded-md border border-transparent px-3 py-2 font-medium text-snow hover:bg-asphalt"
+            class="inline-flex items-center gap-2 rounded-full border border-transparent px-3 py-2 font-medium text-snow-dim transition-all hover:bg-white/5 hover:text-snow"
             :class="{
-              'border-asphalt-light bg-asphalt text-snow': tab.name === activeTabName,
+              'border-white/10 bg-white/5 text-snow shadow-glow-sm': tab.name === activeTabName,
             }"
           >
             <font-awesome-icon :icon="tab.icon" class="text-[11px] lg:text-xs" />
@@ -79,11 +79,11 @@ const handleLogout = async () => {
 
         <button
           type="button"
-          class="hidden sm:inline-flex items-center gap-2 rounded-md border border-asphalt-light px-3 py-2 text-xs text-snow hover:bg-asphalt"
+          class="hidden sm:inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs text-snow transition-all hover:bg-white/10"
           @click="handleLogout"
         >
           <span
-            class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-turf text-snow text-[11px] font-semibold"
+            class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-violet-grad text-white text-[11px] font-semibold shadow-glow-sm"
           >
             {{ userInitial }}
           </span>
@@ -98,4 +98,3 @@ const handleLogout = async () => {
     </div>
   </header>
 </template>
-

@@ -421,7 +421,7 @@ onMounted(() => {
       </div>
       <button
         type="button"
-        class="inline-flex items-center gap-2 rounded-md bg-racket px-3 py-2 text-xs font-medium text-white hover:bg-racket-hover"
+        class="inline-flex items-center gap-2 btn-violet text-xs"
         @click="openCreateModal"
       >
         <font-awesome-icon icon="plus" />
@@ -437,7 +437,7 @@ onMounted(() => {
       {{ toast.message }}
     </div>
 
-    <div class="bg-charcoal rounded-xl border border-asphalt-light p-4 space-y-4">
+    <div class="glass-card p-4 space-y-4">
       <div class="flex items-center justify-between text-xs text-asphalt-muted">
         <span>
           {{ sortedGames.length }} game<span v-if="sortedGames.length !== 1">s</span>
@@ -480,7 +480,7 @@ onMounted(() => {
           <div
             v-for="game in sortedGames"
             :key="game.id"
-            class="rounded-lg border border-asphalt-light bg-charcoal overflow-hidden"
+            class="rounded-lg border border-white/5 bg-charcoal overflow-hidden"
           >
             <button
               type="button"
@@ -517,9 +517,9 @@ onMounted(() => {
               </div>
             </button>
 
-            <div v-if="expandedGameIds.has(game.id)" class="border-t border-asphalt-light">
+            <div v-if="expandedGameIds.has(game.id)" class="border-t border-white/5">
               <div class="grid gap-4 p-4 lg:grid-cols-[1.1fr,0.9fr]">
-                <div class="rounded-lg border border-asphalt-light bg-asphalt/30 p-3">
+                <div class="rounded-lg border border-white/5 bg-asphalt/30 p-3">
                   <p class="text-xs uppercase tracking-wide text-asphalt-muted mb-2">
                     Players in game
                   </p>
@@ -553,14 +553,14 @@ onMounted(() => {
                 </div>
 
                 <div class="space-y-3">
-                  <div class="rounded-lg border border-asphalt-light bg-asphalt/30 p-3">
+                  <div class="rounded-lg border border-white/5 bg-asphalt/30 p-3">
                     <p class="text-xs uppercase tracking-wide text-asphalt-muted mb-2">
                       Game actions
                     </p>
                     <div class="flex flex-wrap gap-2 text-xs">
                       <button
                         type="button"
-                        class="rounded bg-racket px-3 py-2 text-white hover:bg-racket-hover disabled:cursor-not-allowed disabled:opacity-40"
+                        class="btn-violet text-xs disabled:cursor-not-allowed disabled:opacity-40"
                         :disabled="(game.status || 'planned') !== 'planned' || isActionLoading(game.id, 'start')"
                         @click="runLifecycleAction(game, 'start')"
                       >
@@ -603,7 +603,7 @@ onMounted(() => {
                     </p>
                   </div>
 
-                  <div class="rounded-lg border border-asphalt-light bg-asphalt/30 p-3">
+                  <div class="rounded-lg border border-white/5 bg-asphalt/30 p-3">
                     <p class="text-xs uppercase tracking-wide text-asphalt-muted mb-2">
                       Add player
                     </p>
@@ -627,7 +627,7 @@ onMounted(() => {
                     </div>
                   </div>
 
-                  <div class="border border-asphalt-light rounded-lg p-2 min-h-[3rem]">
+                  <div class="border border-white/5 rounded-lg p-2 min-h-[3rem]">
                     <div
                       v-if="playerSearchLoadingByGameId[game.id]"
                       class="flex items-center gap-2 text-xs text-snow-dim"
@@ -682,7 +682,7 @@ onMounted(() => {
 
               <div
                 v-if="schedulesByGameId[game.id]?.rounds?.length"
-                class="border-t border-asphalt-light p-4"
+                class="border-t border-white/5 p-4"
               >
                 <p class="mb-3 text-xs uppercase tracking-wide text-asphalt-muted">
                   Schedule
@@ -691,7 +691,7 @@ onMounted(() => {
                   <div
                     v-for="round in schedulesByGameId[game.id].rounds"
                     :key="round.round"
-                    class="rounded-lg border border-asphalt-light bg-asphalt/40 p-3 text-xs"
+                    class="rounded-lg border border-white/5 bg-asphalt/40 p-3 text-xs"
                   >
                     <p class="mb-2 font-medium text-snow">
                       Round {{ round.round }}
@@ -699,7 +699,7 @@ onMounted(() => {
                     <div
                       v-for="match in round.matches"
                       :key="`${round.round}-${match.field}`"
-                      class="flex justify-between gap-3 border-t border-asphalt-light py-2 first:border-t-0 first:pt-0"
+                      class="flex justify-between gap-3 border-t border-white/5 py-2 first:border-t-0 first:pt-0"
                     >
                       <span class="text-snow-dim">Field {{ match.field }}</span>
                       <span class="text-right text-snow">
@@ -722,7 +722,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="bg-charcoal rounded-xl border border-asphalt-light p-4 space-y-4">
+    <div class="glass-card p-4 space-y-4">
       <div class="flex items-center justify-between text-xs text-asphalt-muted">
         <span>
           Games History ({{ sortedHistoryGames.length }})
@@ -753,7 +753,7 @@ onMounted(() => {
         <div
           v-for="game in sortedHistoryGames"
           :key="`history-${game.id}`"
-          class="rounded-lg border border-asphalt-light bg-charcoal overflow-hidden"
+          class="rounded-lg border border-white/5 bg-charcoal overflow-hidden"
         >
           <button
             type="button"
@@ -785,7 +785,7 @@ onMounted(() => {
             </span>
           </button>
 
-          <div v-if="expandedGameIds.has(game.id)" class="border-t border-asphalt-light p-4">
+          <div v-if="expandedGameIds.has(game.id)" class="border-t border-white/5 p-4">
             <p class="text-xs uppercase tracking-wide text-asphalt-muted mb-2">
               Players
             </p>
@@ -812,7 +812,7 @@ onMounted(() => {
       class="fixed inset-0 z-50 flex items-center justify-center bg-court/80"
       @click.self="showCreateModal = false"
     >
-      <div class="w-full max-w-md rounded-lg bg-charcoal p-5 border border-asphalt-light">
+      <div class="w-full max-w-md glass-card p-5">
         <h3 class="text-lg font-semibold text-snow mb-4">
           Create game
         </h3>
@@ -846,7 +846,7 @@ onMounted(() => {
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded bg-racket px-3 py-2 text-white hover:bg-racket-hover"
+            class="inline-flex items-center gap-2 btn-violet text-xs"
             @click="submitCreate"
           >
             <font-awesome-icon icon="check" />
@@ -862,7 +862,7 @@ onMounted(() => {
       class="fixed inset-0 z-50 flex items-center justify-center bg-court/80 px-4"
       @click.self="closeProcessModal"
     >
-      <div class="w-full max-w-xl rounded-lg bg-charcoal p-5 border border-asphalt-light">
+      <div class="w-full max-w-xl glass-card p-5">
         <h3 class="text-lg font-semibold text-snow mb-1">
           Process scores
         </h3>
@@ -879,7 +879,7 @@ onMounted(() => {
             <select
               id="winner-id"
               v-model="processForm.winnerId"
-              class="mt-1 block w-full rounded-md border border-asphalt-light bg-asphalt px-3 py-2 text-snow shadow-sm focus:border-racket focus:outline-none focus:ring-racket"
+              class="mt-1 block w-full rounded-md border border-white/5 bg-asphalt px-3 py-2 text-snow shadow-sm focus:border-racket focus:outline-none focus:ring-racket"
             >
               <option
                 v-for="score in processForm.scores"
@@ -898,7 +898,7 @@ onMounted(() => {
             <div
               v-for="score in processForm.scores"
               :key="score.userId"
-              class="grid grid-cols-[1fr,7rem] items-center gap-3 rounded border border-asphalt-light bg-asphalt/40 px-3 py-2"
+              class="grid grid-cols-[1fr,7rem] items-center gap-3 rounded border border-white/5 bg-asphalt/40 px-3 py-2"
             >
               <span class="text-sm text-snow">{{ score.username }}</span>
               <input
@@ -907,7 +907,7 @@ onMounted(() => {
                 min="0"
                 step="1"
                 required
-                class="rounded-md border border-asphalt-light bg-asphalt px-3 py-2 text-sm text-snow focus:border-racket focus:outline-none"
+                class="rounded-md border border-white/5 bg-asphalt px-3 py-2 text-sm text-snow focus:border-racket focus:outline-none"
                 placeholder="0"
                 @input="syncWinnerWithScores"
               />
@@ -916,7 +916,7 @@ onMounted(() => {
 
           <div
             v-if="processResult?.eloChanges?.length"
-            class="rounded-lg border border-asphalt-light bg-asphalt/40 p-3"
+            class="rounded-lg border border-white/5 bg-asphalt/40 p-3"
           >
             <p class="mb-2 text-xs uppercase tracking-wide text-asphalt-muted">
               ELO changes
@@ -947,7 +947,7 @@ onMounted(() => {
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded bg-racket px-3 py-2 text-white hover:bg-racket-hover disabled:cursor-not-allowed disabled:opacity-50"
+            class="inline-flex items-center gap-2 btn-violet text-xs disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="processingGame"
             @click="submitProcessGame"
           >

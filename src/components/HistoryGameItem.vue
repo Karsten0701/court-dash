@@ -32,7 +32,7 @@ const status =
 
 <template>
   <div
-    class="bg-charcoal rounded-lg border border-asphalt-light cursor-pointer transition-colors duration-150 hover:border-snow-dim"
+    class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/5 bg-charcoal/70 shadow-card backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-racket/40 hover:shadow-glow"
     @click="emit('navigate', game.id)"
   >
     <div class="p-6">
@@ -54,7 +54,7 @@ const status =
       </p>
 
       <div
-        class="grid grid-cols-3 gap-2 text-sm border-t border-asphalt-light pt-4"
+        class="grid grid-cols-3 gap-2 border-t border-white/5 pt-4 text-sm"
       >
         <span class="text-snow-dim">
           <font-awesome-icon icon="calendar-days" class="mr-1" />

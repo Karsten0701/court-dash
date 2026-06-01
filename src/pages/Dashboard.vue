@@ -63,12 +63,16 @@ const apiStatusLabel = computed(() => {
   <section class="space-y-5">
     <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h2 class="text-xl font-semibold text-snow">Overview</h2>
+        <h2
+          class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-2xl font-extrabold tracking-tight text-transparent"
+        >
+          Overview
+        </h2>
         <p class="text-sm text-snow-dim">Manage the court from one place.</p>
       </div>
       <button
         type="button"
-        class="inline-flex items-center gap-2 rounded-md border border-asphalt-light px-3 py-2 text-xs text-snow hover:bg-asphalt"
+        class="btn-glass text-xs"
         @click="() => { refreshPlayers(); refreshGames(); refreshHealth(); }"
       >
         <font-awesome-icon icon="arrow-rotate-right" />
@@ -77,7 +81,7 @@ const apiStatusLabel = computed(() => {
     </div>
 
     <div class="grid gap-4 sm:grid-cols-3">
-      <div class="rounded-xl border border-asphalt-light bg-charcoal p-5">
+      <div class="glass-card p-5">
         <div class="mb-3 flex items-center justify-between">
           <p class="text-sm font-medium text-snow-dim">Players</p>
           <font-awesome-icon icon="users" class="text-asphalt-muted" />
@@ -96,7 +100,7 @@ const apiStatusLabel = computed(() => {
         </p>
       </div>
 
-      <div class="rounded-xl border border-asphalt-light bg-charcoal p-5">
+      <div class="glass-card p-5">
         <div class="mb-3 flex items-center justify-between">
           <p class="text-sm font-medium text-snow-dim">Games</p>
           <font-awesome-icon icon="calendar-days" class="text-asphalt-muted" />
@@ -115,7 +119,7 @@ const apiStatusLabel = computed(() => {
         </p>
       </div>
 
-      <div class="rounded-xl border border-asphalt-light bg-charcoal p-5">
+      <div class="glass-card p-5">
         <div class="mb-3 flex items-center justify-between">
           <p class="text-sm font-medium text-snow-dim">Active</p>
           <font-awesome-icon icon="bolt" class="text-asphalt-muted" />
@@ -136,7 +140,7 @@ const apiStatusLabel = computed(() => {
     </div>
 
     <div class="grid gap-4 lg:grid-cols-3">
-      <div class="rounded-xl border border-asphalt-light bg-charcoal p-5">
+      <div class="glass-card p-5">
         <div class="mb-4 flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-snow">API</p>
@@ -192,12 +196,12 @@ const apiStatusLabel = computed(() => {
 
       </div>
 
-      <div class="rounded-xl border border-asphalt-light bg-charcoal p-5 lg:col-span-2">
+      <div class="glass-card p-5 lg:col-span-2">
         <p class="text-sm font-medium text-snow">Next actions</p>
         <div class="mt-4 grid gap-3 sm:grid-cols-2">
           <router-link
             to="/games"
-            class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4 hover:bg-asphalt"
+            class="rounded-lg border border-white/5 bg-white/5 p-4 hover:bg-white/10"
           >
             <p class="font-medium text-snow">Run games</p>
             <p class="mt-1 text-sm text-snow-dim">
@@ -206,7 +210,7 @@ const apiStatusLabel = computed(() => {
           </router-link>
           <router-link
             to="/players"
-            class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4 hover:bg-asphalt"
+            class="rounded-lg border border-white/5 bg-white/5 p-4 hover:bg-white/10"
           >
             <p class="font-medium text-snow">Manage players</p>
             <p class="mt-1 text-sm text-snow-dim">

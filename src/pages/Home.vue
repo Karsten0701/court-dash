@@ -46,8 +46,20 @@ onMounted(() => {
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="mb-8 pt-4">
-        <h1 class="text-3xl font-bold text-snow">King of the Court</h1>
-        <p class="text-snow-dim text-sm mt-1">Upcoming games</p>
+        <span
+          class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-snow-dim"
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-turf"></span>
+          Live ranking ladder
+        </span>
+        <h1
+          class="mt-4 bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-4xl font-extrabold tracking-tight text-transparent"
+        >
+          King of the Court
+        </h1>
+        <p class="text-snow-dim text-sm mt-2">
+          Upcoming games - claim your spot.
+        </p>
       </div>
 
       <!-- Skeleton Loading -->
@@ -58,11 +70,11 @@ onMounted(() => {
         <div
           v-for="n in 3"
           :key="n"
-          class="bg-charcoal rounded-lg border border-asphalt-light animate-pulse p-6"
+          class="animate-pulse rounded-2xl border border-white/5 bg-charcoal/70 p-6"
         >
-          <div class="h-5 bg-asphalt-light rounded w-2/3 mb-4"></div>
-          <div class="h-4 bg-asphalt-light rounded w-full mb-2"></div>
-          <div class="h-4 bg-asphalt-light rounded w-4/5"></div>
+          <div class="mb-4 h-5 w-2/3 rounded-full bg-asphalt-light"></div>
+          <div class="mb-2 h-4 w-full rounded-full bg-asphalt-light"></div>
+          <div class="h-4 w-4/5 rounded-full bg-asphalt-light"></div>
         </div>
       </div>
 

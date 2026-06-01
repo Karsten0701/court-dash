@@ -11,16 +11,19 @@ defineEmits(["action"]);
 </script>
 
 <template>
-  <div class="bg-charcoal rounded-lg p-8 text-center">
-    <font-awesome-icon :icon="icon" class="mx-auto h-8 w-8 text-asphalt-muted" />
-    <h3 class="mt-2 text-sm font-medium text-snow">{{ title }}</h3>
+  <div
+    class="rounded-2xl border border-white/5 bg-charcoal/70 p-10 text-center shadow-card backdrop-blur-xl"
+  >
+    <div
+      class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-soft text-racket"
+    >
+      <font-awesome-icon :icon="icon" class="h-6 w-6" />
+    </div>
+    <h3 class="mt-4 text-base font-semibold text-snow">{{ title }}</h3>
     <p v-if="message" class="mt-1 text-sm text-asphalt-muted">{{ message }}</p>
     <div v-if="actionLabel" class="mt-6">
-      <button
-        @click="$emit('action')"
-        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-racket hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket"
-      >
-        <font-awesome-icon v-if="actionIcon" :icon="actionIcon" class="mr-2" />
+      <button @click="$emit('action')" class="btn-violet">
+        <font-awesome-icon v-if="actionIcon" :icon="actionIcon" />
         {{ actionLabel }}
       </button>
     </div>

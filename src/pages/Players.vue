@@ -249,7 +249,7 @@ const confirmDelete = async () => {
       <div class="flex items-center gap-2">
         <button
           type="button"
-          class="inline-flex items-center gap-2 rounded-md bg-racket px-3 py-2 text-xs font-medium text-white hover:bg-racket-hover"
+          class="inline-flex items-center gap-2 btn-violet text-xs"
           @click="openCreateModal"
         >
           <font-awesome-icon icon="user-plus" />
@@ -266,7 +266,7 @@ const confirmDelete = async () => {
       {{ toast.message }}
     </div>
 
-    <div class="bg-charcoal rounded-xl border border-asphalt-light p-4 space-y-4">
+    <div class="glass-card p-4 space-y-4">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex-1 max-w-xs">
           <FormInput
@@ -281,7 +281,7 @@ const confirmDelete = async () => {
           <span>Sort by:</span>
           <button
             type="button"
-            class="rounded-full px-3 py-1 border border-asphalt-light"
+            class="rounded-full px-3 py-1 border border-white/5"
             :class="sortBy === 'elo' ? 'bg-asphalt text-snow' : 'text-snow-dim'"
             @click="setSort('elo')"
           >
@@ -289,7 +289,7 @@ const confirmDelete = async () => {
           </button>
           <button
             type="button"
-            class="rounded-full px-3 py-1 border border-asphalt-light"
+            class="rounded-full px-3 py-1 border border-white/5"
             :class="sortBy === 'name' ? 'bg-asphalt text-snow' : 'text-snow-dim'"
             @click="setSort('name')"
           >
@@ -322,7 +322,7 @@ const confirmDelete = async () => {
           />
         </div>
 
-        <div v-else class="overflow-x-auto rounded-lg border border-asphalt-light">
+        <div v-else class="overflow-x-auto rounded-lg border border-white/5">
           <table class="min-w-full divide-y divide-asphalt-light text-sm">
             <thead class="bg-asphalt">
               <tr>
@@ -445,7 +445,7 @@ const confirmDelete = async () => {
       class="fixed inset-0 z-50 flex items-center justify-center bg-court/80"
       @click.self="showCreateModal = false"
     >
-      <div class="w-full max-w-md rounded-lg bg-charcoal p-5 border border-asphalt-light">
+      <div class="w-full max-w-md glass-card p-5">
         <h3 class="text-lg font-semibold text-snow mb-4">
           Create player
         </h3>
@@ -481,7 +481,7 @@ const confirmDelete = async () => {
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded bg-racket px-3 py-2 text-white hover:bg-racket-hover"
+            class="inline-flex items-center gap-2 btn-violet text-xs"
             @click="submitCreate"
           >
             <font-awesome-icon icon="check" />
@@ -497,7 +497,7 @@ const confirmDelete = async () => {
       class="fixed inset-0 z-50 flex items-center justify-center bg-court/80"
       @click.self="showEditModal = false"
     >
-      <div class="w-full max-w-md rounded-lg bg-charcoal p-5 border border-asphalt-light">
+      <div class="w-full max-w-md glass-card p-5">
         <h3 class="text-lg font-semibold text-snow mb-4">
           Edit player
         </h3>
@@ -520,7 +520,7 @@ const confirmDelete = async () => {
             <select
               id="edit-role"
               v-model="editForm.role"
-              class="mt-1 block w-full rounded-md border border-asphalt-light bg-asphalt px-3 py-2 text-snow shadow-sm focus:border-racket focus:outline-none focus:ring-racket"
+              class="mt-1 block w-full rounded-md border border-white/5 bg-asphalt px-3 py-2 text-snow shadow-sm focus:border-racket focus:outline-none focus:ring-racket"
             >
               <option value="user">User</option>
               <option value="admin">Admin</option>
@@ -544,7 +544,7 @@ const confirmDelete = async () => {
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded bg-racket px-3 py-2 text-white hover:bg-racket-hover"
+            class="inline-flex items-center gap-2 btn-violet text-xs"
             @click="submitEdit"
           >
             <font-awesome-icon icon="check" />
@@ -560,7 +560,7 @@ const confirmDelete = async () => {
       class="fixed inset-0 z-50 flex items-center justify-center bg-court/80"
       @click.self="showHistoryModal = false"
     >
-      <div class="w-full max-w-3xl rounded-lg bg-charcoal p-5 border border-asphalt-light max-h-[85vh] overflow-y-auto">
+      <div class="w-full max-w-3xl glass-card p-5 max-h-[85vh] overflow-y-auto">
         <h3 class="text-lg font-semibold text-snow mb-4">
           {{ selectedPlayer?.name }} - History
         </h3>
@@ -576,14 +576,14 @@ const confirmDelete = async () => {
         />
 
         <div v-else class="space-y-5">
-          <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+          <div class="rounded-lg border border-white/5 bg-asphalt p-4">
             <p class="text-xs uppercase tracking-wide text-asphalt-muted">Current ELO</p>
             <p class="mt-1 text-2xl font-semibold text-snow tabular-nums">
               {{ selectedPlayerEloHistory?.currentElo ?? selectedPlayer?.elo ?? 1000 }}
             </p>
           </div>
 
-          <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+          <div class="rounded-lg border border-white/5 bg-asphalt p-4">
             <p class="text-sm font-semibold text-snow mb-3">Historical ELO</p>
             <div v-if="!(selectedPlayerEloHistory?.history || []).length" class="text-sm text-snow-dim">
               No ELO history entries yet.
@@ -603,7 +603,7 @@ const confirmDelete = async () => {
             </ul>
           </div>
 
-          <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+          <div class="rounded-lg border border-white/5 bg-asphalt p-4">
             <p class="text-sm font-semibold text-snow mb-3">
               Games ({{ selectedPlayerGames.length }})
             </p>

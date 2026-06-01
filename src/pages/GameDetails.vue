@@ -177,12 +177,16 @@ onMounted(() => {
 
       <!-- Game Details -->
       <div v-else-if="game" class="space-y-6">
-        <div class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
+        <div class="glass-card p-6 sm:p-8">
           <!-- Header: name + status -->
           <div
             class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
           >
-            <h1 class="text-3xl font-bold text-snow">{{ game.name }}</h1>
+            <h1
+              class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-3xl font-extrabold tracking-tight text-transparent"
+            >
+              {{ game.name }}
+            </h1>
             <span
               class="self-start shrink-0 px-3 py-1 rounded-full text-sm font-medium"
               :class="[statusDisplay.bg, statusDisplay.text]"
@@ -205,7 +209,7 @@ onMounted(() => {
               <template v-if="game.status === 'planned'">
                 <button
                   v-if="!isUserSignedUp"
-                  class="px-6 py-2.5 bg-racket text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="btn-violet disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="isSigningUp"
                   @click="handleSignup"
                 >
@@ -226,7 +230,7 @@ onMounted(() => {
             <router-link
               v-else
               :to="{ name: 'Login', query: { redirect: $route.fullPath } }"
-              class="inline-block px-6 py-2.5 bg-racket text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover no-underline"
+              class="btn-violet no-underline"
             >
               <FontAwesomeIcon icon="sign-in-alt" class="mr-1" />
               Sign in to join
@@ -235,7 +239,7 @@ onMounted(() => {
         </div>
 
         <!-- Participants Section -->
-        <div class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
+        <div class="glass-card p-6 sm:p-8">
           <h2 class="text-xl font-bold text-snow mb-4">
             Participants ({{ game.participants?.length ?? 0 }})
           </h2>

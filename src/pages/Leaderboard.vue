@@ -142,15 +142,25 @@ onMounted(() => {
   <div class="min-h-[calc(100dvh-var(--nav-h))] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
       <div class="mb-8 pt-4">
-        <h1 class="text-3xl font-bold text-snow">Leaderboard</h1>
-        <p class="mt-1 text-sm text-snow-dim">
+        <span
+          class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-snow-dim"
+        >
+          <font-awesome-icon icon="trophy" class="text-ball" />
+          Season standings
+        </span>
+        <h1
+          class="mt-4 bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-4xl font-extrabold tracking-tight text-transparent"
+        >
+          Leaderboard
+        </h1>
+        <p class="mt-2 text-sm text-snow-dim">
           Rankings update after each game.
         </p>
       </div>
 
       <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
         <section class="space-y-3">
-          <div v-if="isLoading" class="bg-charcoal rounded-lg divide-y divide-asphalt-light animate-pulse">
+          <div v-if="isLoading" class="glass-card animate-pulse divide-y divide-white/5">
             <div v-for="n in 8" :key="n" class="flex items-center justify-between gap-3 px-4 py-3">
               <div class="flex items-center gap-3">
                 <div class="w-6 h-4 rounded bg-asphalt-light shrink-0"></div>
@@ -180,40 +190,56 @@ onMounted(() => {
             @action="fetchLeaderboard"
           />
 
-          <div v-else class="bg-charcoal rounded-lg divide-y divide-asphalt-light">
+          <div v-else class="glass-card divide-y divide-white/5">
             <button
               v-for="(player, index) in leaderboardPlayers"
               :key="player.id"
               type="button"
-              class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-asphalt first:rounded-t-lg last:rounded-b-lg"
+              class="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors first:rounded-t-2xl last:rounded-b-2xl hover:bg-white/5"
               @click="navigateToProfile(player.id)"
             >
               <div class="flex items-center gap-3">
                 <span
-                  class="w-6 shrink-0 text-right text-sm font-bold"
-                  :class="player.rank === 1 ? 'text-ball' : 'text-snow-dim'"
+                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm font-bold"
+                  :class="
+                    player.rank === 1
+                      ? 'bg-ball/15 text-ball'
+                      : player.rank === 2 || player.rank === 3
+                        ? 'bg-white/5 text-snow'
+                        : 'text-snow-dim'
+                  "
                 >{{ player.rank ?? index + 1 }}</span>
 
-                <div class="w-8 h-8 rounded-full bg-asphalt-light flex items-center justify-center text-snow text-sm font-semibold uppercase shrink-0">
+                <div
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold uppercase text-snow"
+                  :class="
+                    player.rank === 1
+                      ? 'bg-violet-grad shadow-glow-sm'
+                      : 'bg-asphalt-light'
+                  "
+                >
                   {{ (player.name || '?').charAt(0) }}
                 </div>
 
                 <div class="flex items-center gap-2 min-w-0">
-                  <span class="truncate text-snow font-medium">{{ player.name || 'Unknown' }}</span>
-                  <font-awesome-icon v-if="player.rank === 1" icon="crown" class="text-ball text-xs shrink-0" />
-                  <font-awesome-icon v-else-if="player.rank === 2 || player.rank === 3" icon="trophy" class="text-racket text-xs shrink-0" />
+                  <span class="truncate font-medium text-snow">{{ player.name || 'Unknown' }}</span>
+                  <font-awesome-icon v-if="player.rank === 1" icon="crown" class="shrink-0 text-xs text-ball" />
+                  <font-awesome-icon v-else-if="player.rank === 2 || player.rank === 3" icon="trophy" class="shrink-0 text-xs text-racket" />
                 </div>
               </div>
 
-              <span class="text-snow-dim text-sm font-mono shrink-0">
-                <font-awesome-icon icon="chart-line" class="mr-1" />{{ player.elo ?? 1000 }} ELO
+              <span
+                class="shrink-0 rounded-full bg-white/5 px-3 py-1 font-mono text-sm text-snow"
+              >
+                {{ player.elo ?? 1000 }}
+                <span class="text-snow-dim">ELO</span>
               </span>
             </button>
           </div>
         </section>
 
         <aside class="space-y-4">
-          <div class="rounded-lg bg-charcoal p-6">
+          <div class="glass-card p-6">
             <div class="flex items-start justify-between gap-4">
               <div>
                 <h2 class="text-xl font-bold text-snow">Find a player</h2>
@@ -221,17 +247,18 @@ onMounted(() => {
                   Look up any player by name.
                 </p>
               </div>
-              <font-awesome-icon
-                icon="user-circle"
-                class="text-2xl text-racket"
-              />
+              <div
+                class="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-soft text-racket"
+              >
+                <font-awesome-icon icon="user-circle" class="text-xl" />
+              </div>
             </div>
 
             <div v-if="isAuthenticated" class="mt-5">
               <form class="space-y-3" @submit.prevent="handleSearch">
                 <label
                   for="player-search"
-                  class="block text-sm font-medium text-snow"
+                  class="block text-xs font-semibold uppercase tracking-wide text-snow-dim"
                 >
                   Name
                 </label>
@@ -240,19 +267,18 @@ onMounted(() => {
                   v-model="searchQuery"
                   type="text"
                   placeholder="Start typing a name"
-                  class="w-full rounded-md border border-asphalt-light bg-asphalt px-3 py-2 text-snow placeholder:text-asphalt-muted focus:border-racket focus:outline-none"
+                  class="w-full rounded-xl border border-white/10 bg-asphalt/60 px-4 py-3 text-snow placeholder:text-asphalt-muted transition-all focus:border-racket focus:outline-none focus:ring-2 focus:ring-racket/30"
                 />
 
                 <div class="flex flex-wrap gap-3">
                   <button
                     type="submit"
-                    class="inline-flex items-center rounded-md bg-racket px-4 py-2 text-sm font-medium text-white hover:bg-racket-hover disabled:cursor-not-allowed disabled:opacity-60"
+                    class="btn-violet"
                     :disabled="isSearching || !hasQuery"
                   >
                     <font-awesome-icon
                       :icon="isSearching ? 'spinner' : 'user-circle'"
                       :class="{ 'animate-spin': isSearching }"
-                      class="mr-2"
                     />
                     {{ isSearching ? "Searching..." : "Search" }}
                   </button>
@@ -260,10 +286,10 @@ onMounted(() => {
                   <button
                     v-if="hasQuery || hasSearched"
                     type="button"
-                    class="inline-flex items-center rounded-md bg-asphalt-light px-4 py-2 text-sm font-medium text-snow hover:bg-asphalt"
+                    class="btn-glass"
                     @click="clearSearch"
                   >
-                    <font-awesome-icon icon="times" class="mr-2" />
+                    <font-awesome-icon icon="times" />
                     Clear
                   </button>
                 </div>
@@ -272,14 +298,14 @@ onMounted(() => {
 
             <div
               v-else
-              class="mt-5 rounded-lg border border-dashed border-asphalt-light bg-asphalt p-4"
+              class="mt-5 rounded-xl border border-dashed border-white/10 bg-white/5 p-4"
             >
               <p class="text-sm text-snow">
                 Sign in to search players and view profiles.
               </p>
               <button
                 type="button"
-                class="mt-4 inline-flex items-center rounded-md bg-racket px-4 py-2 text-sm font-medium text-white hover:bg-racket-hover"
+                class="btn-violet mt-4"
                 @click="
                   router.push({
                     name: 'Login',
@@ -287,7 +313,7 @@ onMounted(() => {
                   })
                 "
               >
-                <font-awesome-icon icon="sign-in-alt" class="mr-2" />
+                <font-awesome-icon icon="sign-in-alt" />
                 Login to search
               </button>
             </div>
@@ -318,7 +344,7 @@ onMounted(() => {
 
           <div
             v-else-if="normalizedSearchResults.length"
-            class="rounded-lg bg-charcoal p-4"
+            class="glass-card p-4"
           >
             <div class="mb-3 flex items-center justify-between gap-3">
               <h3 class="text-sm font-semibold text-snow">
@@ -338,7 +364,7 @@ onMounted(() => {
                 v-for="player in normalizedSearchResults"
                 :key="player.id"
                 type="button"
-                class="flex w-full items-center gap-3 rounded-lg bg-asphalt px-3 py-3 text-left transition-colors hover:bg-asphalt-light"
+                class="flex w-full items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-3 py-3 text-left transition-colors hover:bg-white/10"
                 @click="navigateToProfile(player.id)"
               >
                 <div

@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
     <p class="text-xl text-snow-dim mb-8">Page Not Found</p>
     <router-link
       to="/"
-      class="px-6 py-3 bg-racket text-white rounded-lg hover:bg-racket-hover transition-colors"
+      class="btn-violet"
     >
       <font-awesome-icon icon="home" class="mr-2" />
       Go Back Home

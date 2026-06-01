@@ -106,8 +106,12 @@ onMounted(() => {
   <div class="min-h-[calc(100dvh-var(--nav-h))] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
       <div class="mb-8 pt-4">
-        <h1 class="text-3xl font-bold text-snow">Game History</h1>
-        <p class="text-snow-dim text-sm mt-1">
+        <h1
+          class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-4xl font-extrabold tracking-tight text-transparent"
+        >
+          Game History
+        </h1>
+        <p class="text-snow-dim text-sm mt-2">
           Your past games and performance
         </p>
       </div>
@@ -116,7 +120,7 @@ onMounted(() => {
       <EloChart v-if="eloData" :elo-data="eloData" class="mb-8" />
       <div
         v-else-if="!error"
-        class="bg-charcoal rounded-lg p-6 mb-8 animate-pulse"
+        class="glass-card p-6 mb-8 animate-pulse"
       >
         <div class="h-7 bg-asphalt-light rounded w-1/4 mb-4"></div>
         <div class="h-64 bg-asphalt-light rounded"></div>
@@ -131,8 +135,8 @@ onMounted(() => {
           class="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
           :class="
             activeFilter === tab.key
-              ? 'bg-racket text-white'
-              : 'bg-asphalt-light text-snow hover:bg-asphalt-muted hover:text-snow'
+              ? 'bg-violet-grad text-white shadow-glow-sm'
+              : 'border border-white/10 bg-white/5 text-snow-dim hover:bg-white/10 hover:text-snow'
           "
         >
           {{ tab.label }}
@@ -144,7 +148,7 @@ onMounted(() => {
         <div
           v-for="n in 3"
           :key="n"
-          class="bg-charcoal rounded-lg p-6 animate-pulse"
+          class="glass-card p-6 animate-pulse"
         >
           <div class="h-5 bg-asphalt-light rounded w-1/3 mb-3"></div>
           <div class="h-4 bg-asphalt-light rounded w-2/3"></div>
