@@ -8,7 +8,7 @@ const route = useRoute();
 const router = useRouter();
 
 const tabs = [
-  { to: "/", label: "Overview", name: "Dashboard", icon: "house" },
+  { to: "/dashboard", label: "Overview", name: "Dashboard", icon: "house" },
   { to: "/players", label: "Players", name: "Players", icon: "users" },
   { to: "/games", label: "Games", name: "Games", icon: "table-tennis-paddle-ball" },
 ];
@@ -30,7 +30,7 @@ const handleLogout = async () => {
   try {
     await authService.logout();
   } finally {
-    router.push("/login");
+    router.push("/");
   }
 };
 </script>

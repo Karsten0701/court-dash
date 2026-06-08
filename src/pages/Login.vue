@@ -30,7 +30,7 @@ const handleLogin = async () => {
       return;
     }
 
-    const redirectTo = router.currentRoute.value.query.redirect || "/";
+    const redirectTo = router.currentRoute.value.query.redirect || "/dashboard";
     router.push(redirectTo);
   } catch (err) {
     if (err.message.includes("429") || err.message.includes("rate limit")) {
