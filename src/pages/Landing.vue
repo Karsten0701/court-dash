@@ -1,203 +1,174 @@
 <script setup>
-import { onMounted } from "vue";
-import { useRoute } from "vue-router";
-import appConfig from "@/config/appConfig";
+import PublicSiteFooter from "@/components/PublicSiteFooter.vue";
+import PublicSiteHeader from "@/components/PublicSiteHeader.vue";
 
-const route = useRoute();
+const highlights = [
+  { label: "Setup", value: "Fast" },
+  { label: "Views", value: "Live" },
+  { label: "Admin", value: "Clear" },
+];
 
-const steps = [
+const features = [
   {
-    icon: "calendar-days",
-    title: "Join a session",
-    text: "Pick an upcoming court game and sign up. Spots are limited so the ladder stays competitive.",
+    icon: "users",
+    title: "Player records",
+    text: "Keep players, roles and ranking visibility tidy from one admin view.",
   },
   {
     icon: "table-tennis-paddle-ball",
-    title: "Play it out",
-    text: "Everyone on court gets a match. Results go in after the game — no manual scorekeeping on your phone.",
+    title: "Game control",
+    text: "Create sessions, add participants and move games from planning to results.",
   },
   {
-    icon: "trophy",
-    title: "Move up the board",
-    text: "Your ELO updates when a game is processed. Check the leaderboard to see where you stand.",
+    icon: "server",
+    title: "System checks",
+    text: "See API and database status before match night starts.",
   },
 ];
-
-const faqs = [
-  {
-    q: "What is King of the Court?",
-    a: "A ranking ladder for our court sessions. You sign up for games, play, and your ELO moves based on results.",
-  },
-  {
-    q: "How does ELO work here?",
-    a: "Same idea as elsewhere: beat stronger players, gain more points. Lose to weaker players, drop more. It resets the incentive to show up and play seriously.",
-  },
-  {
-    q: "Do I need an account?",
-    a: "Yes, to sign up for games and appear on the leaderboard. Ask an admin if you need an invite or help getting set up.",
-  },
-  {
-    q: "Who runs the games?",
-    a: "Admins schedule sessions, manage signups, and process results through the dashboard after each court day.",
-  },
-  {
-    q: "I run the league — where do I log in?",
-    a: "Use the Log in button. Admin accounts land in the dashboard to manage players, games, and standings.",
-  },
-];
-
-onMounted(() => {
-  if (route.hash) {
-    const id = route.hash.replace("#", "");
-    requestAnimationFrame(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    });
-  }
-});
 </script>
 
 <template>
-  <div>
-    <!-- Hero -->
-    <section id="home" class="scroll-mt-20 px-4 pb-16 pt-10 lg:px-8 lg:pb-24 lg:pt-16">
-      <div class="mx-auto max-w-6xl">
-        <span
-          class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-snow-dim"
-        >
-          <span class="h-1.5 w-1.5 rounded-full bg-turf"></span>
-          Court ranking ladder
-        </span>
+  <div class="min-h-screen bg-court px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto flex min-h-[calc(100vh-3rem)] max-w-7xl flex-col">
+      <PublicSiteHeader />
 
-        <h1
-          class="mt-5 max-w-2xl bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-5xl lg:text-6xl"
-        >
-          {{ appConfig.name }}
-        </h1>
-
-        <p class="mt-5 max-w-xl text-base leading-relaxed text-snow-dim sm:text-lg">
-          Sign up for court games, play your matches, and climb the leaderboard.
-          Built for our group — not another generic sports app.
-        </p>
-
-        <div class="mt-8 flex flex-wrap items-center gap-3">
-          <router-link to="/login" class="btn-violet">
-            <font-awesome-icon icon="sign-in-alt" />
-            Log in to dashboard
-          </router-link>
-          <a href="#how-it-works" class="btn-glass">
-            How it works
-          </a>
-        </div>
-
-        <div class="mt-14 grid gap-4 sm:grid-cols-3">
-          <div class="glass-card p-5">
-            <p class="text-xs font-semibold uppercase tracking-wide text-asphalt-muted">
-              Games
+      <main class="flex flex-1 flex-col gap-14 py-10 lg:py-14">
+        <section class="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <div class="max-w-3xl">
+            <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-asphalt-muted">
+              For padel and tennis organizers
             </p>
-            <p class="mt-2 text-2xl font-bold text-snow">Scheduled</p>
-            <p class="mt-1 text-sm text-snow-dim">Upcoming court sessions with open spots.</p>
-          </div>
-          <div class="glass-card p-5">
-            <p class="text-xs font-semibold uppercase tracking-wide text-asphalt-muted">
-              Rankings
+            <h1 class="text-4xl font-semibold leading-tight text-snow sm:text-5xl lg:text-6xl">
+              Run your court nights without the spreadsheet mess.
+            </h1>
+            <p class="mt-5 max-w-2xl text-base leading-7 text-snow-dim sm:text-lg">
+              Plan sessions, manage players, follow rankings and keep match-night admin in one clean dashboard.
             </p>
-            <p class="mt-2 text-2xl font-bold text-snow">ELO ladder</p>
-            <p class="mt-1 text-sm text-snow-dim">Updated after every processed game.</p>
-          </div>
-          <div class="glass-card p-5">
-            <p class="text-xs font-semibold uppercase tracking-wide text-asphalt-muted">
-              Admin
-            </p>
-            <p class="mt-2 text-2xl font-bold text-snow">Dashboard</p>
-            <p class="mt-1 text-sm text-snow-dim">Players, games, and results in one place.</p>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- How it works -->
-    <section
-      id="how-it-works"
-      class="scroll-mt-20 border-t border-white/5 px-4 py-16 lg:px-8 lg:py-20"
-    >
-      <div class="mx-auto max-w-6xl">
-        <h2
-          class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-3xl font-extrabold tracking-tight text-transparent"
-        >
-          How it works
-        </h2>
-        <p class="mt-2 max-w-lg text-sm text-snow-dim">
-          Three steps. Show up, play, check the board.
-        </p>
+            <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+              <router-link
+                to="/login"
+                class="inline-flex items-center justify-center gap-2 rounded-md bg-racket px-4 py-2.5 text-sm font-medium text-white hover:bg-racket-hover"
+              >
+                <font-awesome-icon icon="sign-in-alt" />
+                Open dashboard
+              </router-link>
+              <router-link
+                to="/features"
+                class="inline-flex items-center justify-center gap-2 rounded-md border border-asphalt-light px-4 py-2.5 text-sm font-medium text-snow hover:bg-asphalt"
+              >
+                <font-awesome-icon icon="chevron-right" />
+                View features
+              </router-link>
+            </div>
 
-        <ol class="mt-10 grid gap-5 md:grid-cols-3">
-          <li
-            v-for="(step, index) in steps"
-            :key="step.title"
-            class="glass-card relative p-6"
+            <dl class="mt-10 grid max-w-2xl grid-cols-3 gap-3">
+              <div
+                v-for="item in highlights"
+                :key="item.label"
+                class="rounded-lg border border-asphalt-light bg-charcoal p-4"
+              >
+                <dt class="text-xs text-asphalt-muted">{{ item.label }}</dt>
+                <dd class="mt-2 text-2xl font-semibold text-snow">{{ item.value }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card">
+            <div class="mb-5 flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium text-snow">Tonight's court</p>
+                <p class="text-xs text-asphalt-muted">Planning overview</p>
+              </div>
+              <span class="inline-flex items-center gap-2 rounded-full bg-turf/20 px-3 py-1 text-xs font-medium text-turf">
+                <span class="h-2 w-2 rounded-full bg-turf" />
+                Ready
+              </span>
+            </div>
+
+            <div class="grid gap-3 sm:grid-cols-3">
+              <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
+                <p class="text-xs text-asphalt-muted">Players</p>
+                <p class="mt-2 text-3xl font-semibold tabular-nums text-snow">24</p>
+              </div>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
+                <p class="text-xs text-asphalt-muted">Games</p>
+                <p class="mt-2 text-3xl font-semibold tabular-nums text-snow">8</p>
+              </div>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
+                <p class="text-xs text-asphalt-muted">Courts</p>
+                <p class="mt-2 text-3xl font-semibold tabular-nums text-snow">4</p>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-3">
+              <div class="flex items-center justify-between rounded-lg border border-asphalt-light bg-asphalt/40 p-3">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-8 w-8 items-center justify-center rounded-md bg-racket text-xs text-white">
+                    <font-awesome-icon icon="calendar-days" />
+                  </span>
+                  <div>
+                    <p class="text-sm font-medium text-snow">King round 1</p>
+                    <p class="text-xs text-asphalt-muted">Court 2 - 19:30</p>
+                  </div>
+                </div>
+                <font-awesome-icon icon="chevron-right" class="text-asphalt-muted" />
+              </div>
+              <div class="flex items-center justify-between rounded-lg border border-asphalt-light bg-asphalt/40 p-3">
+                <div class="flex items-center gap-3">
+                  <span class="flex h-8 w-8 items-center justify-center rounded-md bg-turf text-xs text-white">
+                    <font-awesome-icon icon="trophy" />
+                  </span>
+                  <div>
+                    <p class="text-sm font-medium text-snow">Ranking update</p>
+                    <p class="text-xs text-asphalt-muted">Scores processed after the final match</p>
+                  </div>
+                </div>
+                <font-awesome-icon icon="chevron-right" class="text-asphalt-muted" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid gap-4 lg:grid-cols-3">
+          <article
+            v-for="feature in features"
+            :key="feature.title"
+            class="rounded-lg border border-asphalt-light bg-charcoal p-5"
           >
-            <span
-              class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-violet-soft text-racket"
-            >
-              <font-awesome-icon :icon="step.icon" />
-            </span>
-            <p class="text-xs font-semibold uppercase tracking-wide text-asphalt-muted">
-              Step {{ index + 1 }}
-            </p>
-            <h3 class="mt-1 text-lg font-bold text-snow">{{ step.title }}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-snow-dim">
-              {{ step.text }}
-            </p>
-          </li>
-        </ol>
-      </div>
-    </section>
+            <font-awesome-icon :icon="feature.icon" class="text-asphalt-muted" />
+            <h2 class="mt-4 text-base font-semibold text-snow">{{ feature.title }}</h2>
+            <p class="mt-2 text-sm leading-6 text-snow-dim">{{ feature.text }}</p>
+          </article>
+        </section>
 
-    <!-- FAQ -->
-    <section id="faq" class="scroll-mt-20 border-t border-white/5 px-4 py-16 lg:px-8 lg:py-20">
-      <div class="mx-auto max-w-6xl">
-        <h2
-          class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-3xl font-extrabold tracking-tight text-transparent"
-        >
-          FAQ
-        </h2>
-        <p class="mt-2 text-sm text-snow-dim">
-          Common questions before your first game.
-        </p>
-
-        <div class="mt-8 space-y-3">
-          <details
-            v-for="item in faqs"
-            :key="item.q"
-            class="group glass-card px-5 py-4"
-          >
-            <summary
-              class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-snow"
-            >
-              {{ item.q }}
-              <font-awesome-icon
-                icon="chevron-right"
-                class="shrink-0 text-xs text-asphalt-muted transition-transform group-open:rotate-90"
-              />
-            </summary>
-            <p class="mt-3 text-sm leading-relaxed text-snow-dim">
-              {{ item.a }}
-            </p>
-          </details>
-        </div>
-
-        <div class="mt-10 rounded-2xl border border-white/5 bg-white/5 p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
-          <div>
-            <p class="font-semibold text-snow">Ready to manage the court?</p>
-            <p class="mt-1 text-sm text-snow-dim">
-              Admins use the dashboard to run games and update standings.
-            </p>
+        <section class="rounded-lg border border-asphalt-light bg-charcoal p-5 lg:p-6">
+          <div class="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+            <div>
+              <p class="text-sm font-semibold text-snow">Built for repeated use</p>
+              <p class="mt-2 text-sm leading-6 text-snow-dim">
+                The layout stays quiet and practical: quick scanning, clear actions and no heavy marketing clutter.
+              </p>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-3">
+              <router-link to="/features" class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4 hover:bg-asphalt">
+                <p class="text-sm font-medium text-snow">Features</p>
+                <p class="mt-1 text-xs text-snow-dim">What the dashboard handles.</p>
+              </router-link>
+              <router-link to="/pricing" class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4 hover:bg-asphalt">
+                <p class="text-sm font-medium text-snow">Pricing</p>
+                <p class="mt-1 text-xs text-snow-dim">Simple plans for clubs.</p>
+              </router-link>
+              <router-link to="/contact" class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4 hover:bg-asphalt">
+                <p class="text-sm font-medium text-snow">Contact</p>
+                <p class="mt-1 text-xs text-snow-dim">Prepare your setup.</p>
+              </router-link>
+            </div>
           </div>
-          <router-link to="/login" class="btn-violet mt-4 shrink-0 sm:mt-0">
-            Go to dashboard
-          </router-link>
-        </div>
-      </div>
-    </section>
+        </section>
+      </main>
+
+      <PublicSiteFooter />
+    </div>
   </div>
 </template>
