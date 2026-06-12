@@ -7,6 +7,9 @@ const Players = () => import("@/pages/Players.vue");
 const Games = () => import("@/pages/Games.vue");
 const ApiStatus = () => import("@/pages/ApiStatus.vue");
 const Login = () => import("@/pages/Login.vue");
+const FeaturesLanding = () => import("@/pages/FeaturesLanding.vue");
+const PricingLanding = () => import("@/pages/PricingLanding.vue");
+const ContactLanding = () => import("@/pages/ContactLanding.vue");
 const NotFound = () => import("@/pages/NotFound.vue");
 
 const adminMeta = (title) => ({
@@ -44,7 +47,25 @@ const routes = [
     path: "/login",
     name: "Login",
     component: Login,
-    meta: { title: `Login • ${appConfig.name}` },
+    meta: { title: `Home • ${appConfig.name}` },
+  },
+  {
+    path: "/features",
+    name: "FeaturesLanding",
+    component: FeaturesLanding,
+    meta: { title: `Features • ${appConfig.name}` },
+  },
+  {
+    path: "/pricing",
+    name: "PricingLanding",
+    component: PricingLanding,
+    meta: { title: `Pricing • ${appConfig.name}` },
+  },
+  {
+    path: "/contact",
+    name: "ContactLanding",
+    component: ContactLanding,
+    meta: { title: `Contact • ${appConfig.name}` },
   },
   {
     path: "/signup",

@@ -1,0 +1,94 @@
+<script setup>
+import PublicSiteFooter from "@/components/PublicSiteFooter.vue";
+import PublicSiteHeader from "@/components/PublicSiteHeader.vue";
+
+const featureGroups = [
+  {
+    icon: "calendar-days",
+    title: "Plan every session",
+    text: "Create upcoming games, assign players and keep the schedule readable for the whole evening.",
+  },
+  {
+    icon: "users",
+    title: "Manage players",
+    text: "Keep accounts, roles and player records in one place without switching between loose files.",
+  },
+  {
+    icon: "trophy",
+    title: "Track standings",
+    text: "Process results after games and keep rankings easy to follow for admins and players.",
+  },
+  {
+    icon: "server",
+    title: "Check system health",
+    text: "See API and database status before you start, so problems are visible early.",
+  },
+];
+</script>
+
+<template>
+  <div class="min-h-screen bg-court px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl">
+      <PublicSiteHeader />
+
+      <main class="py-12 lg:py-16">
+        <section class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+          <div>
+            <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-asphalt-muted">
+              Features
+            </p>
+            <h1 class="text-4xl font-semibold leading-tight text-snow sm:text-5xl">
+              Everything your court night needs, without extra noise.
+            </h1>
+          </div>
+          <p class="max-w-2xl text-base leading-7 text-snow-dim">
+            King of the Court focuses on the actual admin work: players, games,
+            scores, rankings and API status. The interface stays close to the
+            dashboard, so it feels practical from the first click.
+          </p>
+        </section>
+
+        <section class="mt-12 grid gap-4 md:grid-cols-2">
+          <article
+            v-for="feature in featureGroups"
+            :key="feature.title"
+            class="rounded-lg border border-asphalt-light bg-charcoal p-5"
+          >
+            <div class="flex h-10 w-10 items-center justify-center rounded-md bg-asphalt text-snow-dim">
+              <font-awesome-icon :icon="feature.icon" />
+            </div>
+            <h2 class="mt-5 text-lg font-semibold text-snow">{{ feature.title }}</h2>
+            <p class="mt-2 text-sm leading-6 text-snow-dim">{{ feature.text }}</p>
+          </article>
+        </section>
+
+        <section class="mt-12 rounded-lg border border-asphalt-light bg-charcoal p-5 lg:p-6">
+          <div class="grid gap-6 lg:grid-cols-3">
+            <div class="lg:col-span-1">
+              <p class="text-sm font-semibold text-snow">Admin workflow</p>
+              <p class="mt-2 text-sm leading-6 text-snow-dim">
+                A clean path from planning to processed results.
+              </p>
+            </div>
+            <div class="grid gap-3 lg:col-span-2">
+              <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
+                <p class="text-sm font-medium text-snow">1. Create the game</p>
+                <p class="mt-1 text-sm text-snow-dim">Set the session details and keep it visible in the dashboard.</p>
+              </div>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
+                <p class="text-sm font-medium text-snow">2. Add players</p>
+                <p class="mt-1 text-sm text-snow-dim">Select participants and make the court list easy to scan.</p>
+              </div>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
+                <p class="text-sm font-medium text-snow">3. Process scores</p>
+                <p class="mt-1 text-sm text-snow-dim">Finish games and update ranking data after the session.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <PublicSiteFooter />
+    </div>
+  </div>
+</template>
