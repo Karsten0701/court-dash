@@ -14,7 +14,10 @@ defineEmits(["update:modelValue"]);
 
 <template>
   <div>
-    <label :for="id" class="block text-sm font-medium text-snow">
+    <label
+      :for="id"
+      class="block text-xs font-semibold uppercase tracking-wide text-snow-dim"
+    >
       {{ label }} <span v-if="required" class="text-danger">*</span>
     </label>
     <input
@@ -25,7 +28,7 @@ defineEmits(["update:modelValue"]);
       :required="required"
       :disabled="disabled"
       :placeholder="placeholder"
-      class="mt-1 block w-full px-3 py-2 bg-asphalt text-snow border border-asphalt-light rounded-md shadow-sm focus:outline-none focus:ring-racket focus:border-racket disabled:opacity-50 disabled:cursor-not-allowed"
+      class="mt-2 block w-full rounded-xl border border-white/10 bg-asphalt/60 px-4 py-3 text-snow placeholder:text-asphalt-muted transition-all focus:border-racket focus:outline-none focus:ring-2 focus:ring-racket/30 disabled:cursor-not-allowed disabled:opacity-50"
     />
   </div>
 </template>

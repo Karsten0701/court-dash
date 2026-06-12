@@ -47,8 +47,8 @@ const createChart = () => {
     0,
     canvas.value.clientHeight || 300,
   );
-  gradient.addColorStop(0, "rgba(59, 130, 246, 0.12)");
-  gradient.addColorStop(1, "rgba(59, 130, 246, 0)");
+  gradient.addColorStop(0, "rgba(124, 92, 252, 0.35)");
+  gradient.addColorStop(1, "rgba(124, 92, 252, 0)");
 
   const labels = props.eloData.history.map((h) => formatDate(h.recordedAt));
   const data = props.eloData.history.map((h) => h.elo);
@@ -61,16 +61,17 @@ const createChart = () => {
       datasets: [
         {
           data,
-          borderColor: "#3b82f6",
+          borderColor: "#a78bfa",
           backgroundColor: gradient,
-          pointBackgroundColor: "#3b82f6",
-          pointBorderColor: "#3b82f6",
-          pointHoverBackgroundColor: "#2563eb",
-          pointHoverBorderColor: "#2563eb",
+          pointBackgroundColor: "#7c5cfc",
+          pointBorderColor: "#16131f",
+          pointHoverBackgroundColor: "#a78bfa",
+          pointHoverBorderColor: "#ffffff",
+          pointBorderWidth: 2,
           pointRadius: 4,
           pointHoverRadius: 6,
-          borderWidth: 2,
-          tension: 0.3,
+          borderWidth: 3,
+          tension: 0.4,
           fill: true,
         },
       ],
@@ -80,12 +81,14 @@ const createChart = () => {
       maintainAspectRatio: false,
       plugins: {
         tooltip: {
-          backgroundColor: "#1e1e1e",
-          titleColor: "#9ca3af",
-          bodyColor: "#f0f0f0",
-          borderColor: "#2e2e2e",
+          backgroundColor: "#211d2e",
+          titleColor: "#9b94b8",
+          bodyColor: "#f4f3fb",
+          borderColor: "rgba(124, 92, 252, 0.4)",
           borderWidth: 1,
-          padding: 10,
+          padding: 12,
+          cornerRadius: 12,
+          displayColors: false,
           callbacks: {
             title: (items) => {
               const idx = items[0].dataIndex;
@@ -98,12 +101,14 @@ const createChart = () => {
       },
       scales: {
         x: {
-          grid: { color: "#2e2e2e" },
-          ticks: { color: "#9ca3af" },
+          grid: { color: "rgba(255, 255, 255, 0.04)" },
+          border: { display: false },
+          ticks: { color: "#9b94b8" },
         },
         y: {
-          grid: { color: "#2e2e2e" },
-          ticks: { color: "#9ca3af" },
+          grid: { color: "rgba(255, 255, 255, 0.04)" },
+          border: { display: false },
+          ticks: { color: "#9b94b8" },
         },
       },
     },
@@ -131,10 +136,31 @@ watch(
 </script>
 
 <template>
-  <div :class="['rounded-lg p-6', nested ? 'bg-asphalt' : 'bg-charcoal']">
-    <h2 v-if="!nested" class="text-lg font-semibold text-snow mb-4">
-      Current ELO: {{ eloData.currentElo }}
-    </h2>
+  <div
+    :class="[
+      'p-6',
+      nested
+        ? 'rounded-xl border border-white/5 bg-white/5'
+        : 'glass-card',
+    ]"
+  >
+    <div v-if="!nested" class="mb-5 flex items-center justify-between gap-3">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-snow-dim">
+          Current ELO
+        </p>
+        <p
+          class="mt-1 bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-3xl font-extrabold text-transparent"
+        >
+          {{ eloData.currentElo }}
+        </p>
+      </div>
+      <div
+        class="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-soft text-racket"
+      >
+        <font-awesome-icon icon="chart-line" class="text-xl" />
+      </div>
+    </div>
     <div v-if="hasHistory()" class="relative h-64">
       <canvas ref="canvas"></canvas>
     </div>

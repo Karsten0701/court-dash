@@ -32,10 +32,9 @@ const handleLogin = async () => {
       return;
     }
 
-    const redirectTo = router.currentRoute.value.query.redirect || "/";
+    const redirectTo = router.currentRoute.value.query.redirect || "/dashboard";
     router.push(redirectTo);
   } catch (err) {
-    // Check for different error types
     if (err.message.includes("429") || err.message.includes("rate limit")) {
       error.value = "Rate limited. Please try again later.";
     } else if (
@@ -249,5 +248,3 @@ const handleLogin = async () => {
     </div>
   </div>
 </template>
-
-<style scoped></style>

@@ -33,18 +33,35 @@ const navItems = [
 
 <template>
   <nav
-    class="fixed bottom-0 left-0 right-0 z-50 bg-charcoal text-white shadow-md"
+    class="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-4 pt-2"
     :class="{ hidden: route.name === 'NotFound' }"
   >
-    <ul class="grid grid-cols-4 items-center gap-1 px-2 py-2 sm:px-4">
-      <li v-for="item in navItems" :key="item.to" class="min-w-0">
+    <ul
+      class="flex w-full max-w-md items-center justify-between gap-1 rounded-full border border-white/10 bg-charcoal/80 px-3 py-2 shadow-card backdrop-blur-xl sm:px-4"
+    >
+      <li v-for="item in navItems" :key="item.to" class="min-w-0 flex-1">
         <router-link
           :to="item.to"
-          class="flex min-w-0 flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors text-gray-400 hover:text-white"
-          :class="{ 'text-white': item.names.includes(route.name) }"
+          class="group relative flex min-w-0 flex-col items-center gap-1 rounded-full px-2 py-2 transition-all duration-200"
+          :class="
+            item.names.includes(route.name)
+              ? 'text-white'
+              : 'text-snow-dim hover:text-white'
+          "
         >
-          <font-awesome-icon :icon="item.icon" class="text-xl sm:text-2xl" />
-          <span class="truncate text-[11px] leading-none sm:text-xs">{{ item.label }}</span>
+          <span
+            class="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
+            :class="
+              item.names.includes(route.name)
+                ? 'bg-violet-grad shadow-glow-sm'
+                : 'bg-transparent group-hover:bg-white/5'
+            "
+          >
+            <font-awesome-icon :icon="item.icon" class="text-base sm:text-lg" />
+          </span>
+          <span class="truncate text-[10px] font-medium leading-none sm:text-xs">{{
+            item.label
+          }}</span>
         </router-link>
       </li>
     </ul>

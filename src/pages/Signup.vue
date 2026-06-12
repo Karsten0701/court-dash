@@ -152,7 +152,7 @@ const handleSignup = async () => {
           <button
             type="submit"
             :disabled="isLoading"
-            class="group relative w-full flex items-center justify-center gap-2 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-racket hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket disabled:opacity-50 disabled:cursor-not-allowed"
+            class="btn-violet w-full py-3"
           >
             <LoadingSpinner v-if="isLoading" class="text-white" />
             <font-awesome-icon v-else icon="user-plus" />

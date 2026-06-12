@@ -19,7 +19,7 @@ const sortedParticipants = computed(() => {
 </script>
 
 <template>
-  <div class="bg-charcoal rounded-lg p-6">
+  <div class="glass-card p-6">
     <h2 class="text-lg font-semibold text-snow mb-4">Scoreboard</h2>
 
     <div
@@ -32,7 +32,7 @@ const sortedParticipants = computed(() => {
     <div v-else class="overflow-x-auto">
       <table class="w-full text-left">
         <thead>
-          <tr class="border-b border-asphalt-light">
+          <tr class="border-b border-white/5">
             <th class="pb-3 text-xs text-asphalt-muted w-16">#</th>
             <th class="pb-3 text-xs text-asphalt-muted">Player</th>
             <th class="pb-3 text-xs text-asphalt-muted text-right">Score</th>
@@ -42,7 +42,7 @@ const sortedParticipants = computed(() => {
           <tr
             v-for="(participant, index) in sortedParticipants"
             :key="participant.id"
-            class="border-b border-asphalt-light last:border-b-0"
+            class="border-b border-white/5 last:border-b-0"
           >
             <td class="py-3 w-16">
               <span

@@ -2,10 +2,10 @@ import { createRouter, createWebHistory } from "vue-router";
 import authService from "@/services/authService.js";
 import appConfig from "@/config/appConfig.js";
 
+const Landing = () => import("@/pages/Landing.vue");
 const Dashboard = () => import("@/pages/Dashboard.vue");
 const Players = () => import("@/pages/Players.vue");
 const Games = () => import("@/pages/Games.vue");
-const ApiStatus = () => import("@/pages/ApiStatus.vue");
 const Login = () => import("@/pages/Login.vue");
 const FeaturesLanding = () => import("@/pages/FeaturesLanding.vue");
 const PricingLanding = () => import("@/pages/PricingLanding.vue");
@@ -21,6 +21,12 @@ const adminMeta = (title) => ({
 const routes = [
   {
     path: "/",
+    name: "Landing",
+    component: Landing,
+    meta: { title: appConfig.name, isLanding: true },
+  },
+  {
+    path: "/dashboard",
     name: "Dashboard",
     component: Dashboard,
     meta: adminMeta(`Overview • ${appConfig.name}`),
@@ -36,12 +42,6 @@ const routes = [
     name: "Games",
     component: Games,
     meta: adminMeta(`Games • ${appConfig.name}`),
-  },
-  {
-    path: "/status",
-    name: "ApiStatus",
-    component: ApiStatus,
-    meta: adminMeta(`API Status • ${appConfig.name}`),
   },
   {
     path: "/login",
@@ -84,13 +84,33 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior(_, __, savedPosition) {
-    return savedPosition || { top: 0 };
+  scrollBehavior(to, _, savedPosition) {
+    if (savedPosition) return savedPosition;
+    if (to.hash) {
+      return { el: to.hash, behavior: "smooth", top: 80 };
+    }
+    return { top: 0 };
   },
 });
 
 router.beforeEach(async (to, from, next) => {
   document.title = to.meta.title || appConfig.name;
+
+  if (to.name === "Landing") {
+    if (!authService.isAuthenticated() || !authService.isAdmin()) {
+      next();
+      return;
+    }
+
+    const valid = await authService.isLoggedInWithTokenCheck();
+    if (valid) {
+      next({ name: "Dashboard" });
+      return;
+    }
+
+    next();
+    return;
+  }
 
   if (to.meta.requiresAuth) {
     const hasSession = await authService.isLoggedInWithTokenCheck();
@@ -120,7 +140,7 @@ router.beforeEach(async (to, from, next) => {
       return;
     }
 
-    const redirectTo = to.query.redirect || "/";
+    const redirectTo = to.query.redirect || "/dashboard";
     next(redirectTo);
     return;
   }

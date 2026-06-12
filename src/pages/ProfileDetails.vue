@@ -131,9 +131,9 @@ onMounted(() => {
       </button>
 
       <!-- Loading skeleton -->
-      <div v-if="isLoading" class="rounded-lg bg-charcoal p-6 animate-pulse">
+      <div v-if="isLoading" class="glass-card p-6 animate-pulse">
         <div
-          class="flex items-center justify-between gap-4 border-b border-asphalt-light pb-5"
+          class="flex items-center justify-between gap-4 border-b border-white/5 pb-5"
         >
           <div class="flex items-center gap-4">
             <div
@@ -193,23 +193,27 @@ onMounted(() => {
         </template>
       </ErrorMessage>
 
-      <section v-else-if="player" class="rounded-lg bg-charcoal p-6">
+      <section v-else-if="player" class="glass-card p-6">
         <!-- Header: avatar + name/badges left, ELO right -->
         <div
-          class="flex flex-wrap items-center justify-between gap-4 border-b border-asphalt-light pb-5"
+          class="flex flex-wrap items-center justify-between gap-4 border-b border-white/5 pb-5"
         >
           <div class="flex items-center gap-4">
             <div
-              class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-asphalt-light text-2xl font-bold text-snow"
+              class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-violet-grad text-2xl font-bold text-white shadow-glow-sm"
             >
               {{ profileInitial }}
             </div>
             <div>
               <div class="flex flex-wrap items-center gap-2">
-                <h2 class="text-2xl font-bold text-snow">{{ displayName }}</h2>
+                <h2
+                  class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-2xl font-extrabold text-transparent"
+                >
+                  {{ displayName }}
+                </h2>
                 <span
                   v-if="isOwnProfile"
-                  class="rounded-full bg-racket/20 px-3 py-1 text-xs font-medium text-racket"
+                  class="rounded-full bg-racket/15 px-3 py-1 text-xs font-semibold text-racket ring-1 ring-racket/30"
                 >
                   You
                 </span>
@@ -225,8 +229,12 @@ onMounted(() => {
             </div>
           </div>
 
-          <div class="rounded-lg bg-asphalt px-4 py-3 text-center">
-            <p class="text-3xl font-bold text-snow">{{ player.elo ?? 1000 }}</p>
+          <div class="rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-center">
+            <p
+              class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-3xl font-extrabold text-transparent"
+            >
+              {{ player.elo ?? 1000 }}
+            </p>
             <p class="mt-1 text-xs uppercase tracking-wide text-snow-dim">
               Rating
             </p>
@@ -235,13 +243,13 @@ onMounted(() => {
 
         <!-- Stats -->
         <div class="grid grid-cols-2 gap-3 pt-5">
-          <div class="rounded-lg bg-asphalt px-4 py-3">
+          <div class="rounded-xl border border-white/5 bg-white/5 px-4 py-3">
             <p class="text-xs uppercase tracking-wide text-snow-dim">
               Member ID
             </p>
             <p class="mt-1 text-sm font-medium text-snow">{{ player.id }}</p>
           </div>
-          <div class="rounded-lg bg-asphalt px-4 py-3">
+          <div class="rounded-xl border border-white/5 bg-white/5 px-4 py-3">
             <p class="text-xs uppercase tracking-wide text-snow-dim">Joined</p>
             <p class="mt-1 text-sm font-medium text-snow">{{ memberSince }}</p>
           </div>
@@ -258,7 +266,7 @@ onMounted(() => {
         <!-- Admin-only account section -->
         <div
           v-if="player.email || player.role"
-          class="mt-5 rounded-lg border border-asphalt-light bg-asphalt p-4"
+          class="mt-5 rounded-xl border border-white/5 bg-white/5 p-4"
         >
           <h3 class="text-sm font-semibold text-snow">Account</h3>
           <div class="mt-4 grid gap-4 sm:grid-cols-2">

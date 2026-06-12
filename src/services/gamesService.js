@@ -22,8 +22,12 @@ class GamesService {
     return withParticipants;
   }
 
-  async listPlannedGames() {
+  async listAllGames() {
     return this.listAdminGames();
+  }
+
+  async listPlannedGames() {
+    return this.listAllGames();
   }
 
   async getGameDetails(id) {

@@ -12,21 +12,29 @@ const props = defineProps({
 const router = useRouter();
 
 const statusConfig = {
-  planned: { label: "Planned", bg: "bg-racket/20", text: "text-racket" },
+  planned: {
+    label: "Planned",
+    bg: "bg-racket/15",
+    text: "text-racket",
+    ring: "ring-racket/30",
+  },
   started: {
-    label: "Started",
-    bg: "bg-status-pending/20",
+    label: "Live",
+    bg: "bg-status-pending/15",
     text: "text-status-pending",
+    ring: "ring-status-pending/30",
   },
   ended: {
     label: "Ended",
-    bg: "bg-status-delivering/20",
+    bg: "bg-status-delivering/15",
     text: "text-status-delivering",
+    ring: "ring-status-delivering/30",
   },
   processed: {
     label: "Processed",
-    bg: "bg-status-processed/20",
+    bg: "bg-status-processed/15",
     text: "text-status-processed",
+    ring: "ring-status-processed/30",
   },
 };
 
@@ -39,40 +47,57 @@ const viewDetails = () => {
 
 <template>
   <div
-    class="bg-charcoal rounded-lg border border-asphalt-light cursor-pointer transition-colors duration-150 hover:border-snow-dim"
+    class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/5 bg-charcoal/70 shadow-card backdrop-blur-xl transition-all duration-200 hover:-translate-y-1 hover:border-racket/40 hover:shadow-glow"
     @click="viewDetails"
   >
-    <div class="p-6">
+    <div
+      class="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-racket/20 blur-3xl transition-opacity duration-300 group-hover:opacity-100 opacity-60"
+    ></div>
+
+    <div class="relative p-6">
       <div class="flex items-start justify-between gap-3 mb-3">
-        <h3 class="text-xl font-semibold text-snow">{{ game.name }}</h3>
+        <h3 class="text-xl font-bold text-snow">{{ game.name }}</h3>
         <span
-          class="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium"
-          :class="[status.bg, status.text]"
+          class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset"
+          :class="[status.bg, status.text, status.ring]"
         >
           {{ status.label }}
         </span>
       </div>
 
-      <p class="text-snow-dim text-sm mb-4 leading-relaxed line-clamp-2">
+      <p class="text-snow-dim text-sm mb-5 leading-relaxed line-clamp-2">
         {{ game.description }}
       </p>
 
-      <div
-        class="grid grid-cols-3 gap-2 text-sm border-t border-asphalt-light pt-4"
-      >
-        <span class="text-snow-dim">
-          <font-awesome-icon icon="calendar-days" class="mr-1" />
-          {{ formatDate(game.plannedAt) }}
-        </span>
-        <span class="text-snow-dim text-center">
-          {{ game.signupCount ?? 0 }} players
-        </span>
-        <span class="text-snow-dim text-right">
-          <template v-if="game.averageElo != null">
-            ~{{ game.averageElo }} ELO
-          </template>
-          <template v-else>--</template>
-        </span>
+      <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-4 text-sm">
+        <div class="min-w-0">
+          <p class="text-[11px] uppercase tracking-wide text-asphalt-muted">
+            Date
+          </p>
+          <p class="mt-0.5 truncate font-medium text-snow">
+            <font-awesome-icon icon="calendar-days" class="mr-1 text-racket" />
+            {{ formatDate(game.plannedAt) }}
+          </p>
+        </div>
+        <div class="min-w-0 text-center">
+          <p class="text-[11px] uppercase tracking-wide text-asphalt-muted">
+            Players
+          </p>
+          <p class="mt-0.5 font-semibold text-snow">
+            {{ game.signupCount ?? 0 }}
+          </p>
+        </div>
+        <div class="min-w-0 text-right">
+          <p class="text-[11px] uppercase tracking-wide text-asphalt-muted">
+            Avg ELO
+          </p>
+          <p class="mt-0.5 font-semibold text-snow">
+            <template v-if="game.averageElo != null">
+              ~{{ game.averageElo }}
+            </template>
+            <template v-else>--</template>
+          </p>
+        </div>
       </div>
     </div>
   </div>

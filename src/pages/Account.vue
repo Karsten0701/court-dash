@@ -124,12 +124,16 @@ onMounted(() => {
   <div class="min-h-[calc(100dvh-var(--nav-h))] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-3xl mx-auto">
       <div class="mb-8 pt-4">
-        <h1 class="text-3xl font-bold text-snow">Account</h1>
-        <p class="text-snow-dim text-sm mt-1">Manage your profile</p>
+        <h1
+          class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-4xl font-extrabold tracking-tight text-transparent"
+        >
+          Account
+        </h1>
+        <p class="text-snow-dim text-sm mt-2">Manage your profile</p>
       </div>
 
       <!-- Loading Skeleton -->
-      <div v-if="isLoading" class="bg-charcoal rounded-lg p-6 animate-pulse">
+      <div v-if="isLoading" class="glass-card p-6 animate-pulse">
         <div class="h-5 bg-asphalt-light rounded w-1/3 mb-4"></div>
         <div class="h-4 bg-asphalt-light rounded w-1/2 mb-3"></div>
         <div class="h-4 bg-asphalt-light rounded w-2/5 mb-3"></div>
@@ -148,7 +152,7 @@ onMounted(() => {
 
       <!-- Account Information -->
       <div v-else-if="user">
-        <div class="bg-charcoal rounded-lg">
+        <div class="glass-card">
           <!-- View Mode -->
           <div v-if="!isEditing" class="p-6">
             <div class="flex gap-8">
@@ -208,19 +212,23 @@ onMounted(() => {
 
               <!-- Avatar + ELO (right side, hidden on small screens) -->
               <div
-                class="hidden sm:flex flex-col items-center justify-center px-6 border-l border-asphalt-light min-w-[160px]"
+                class="hidden sm:flex flex-col items-center justify-center px-6 border-l border-white/5 min-w-[160px]"
               >
                 <div
-                  class="w-20 h-20 rounded-full bg-asphalt flex items-center justify-center mb-3"
+                  class="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-violet-grad shadow-glow"
                 >
-                  <span class="text-2xl font-bold text-snow">
+                  <span class="text-2xl font-bold text-white">
                     {{ (user.username || user.name || "?")[0].toUpperCase() }}
                   </span>
                 </div>
-                <p class="text-2xl font-bold text-snow">
+                <p
+                  class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-3xl font-extrabold text-transparent"
+                >
                   {{ user.elo ?? 1000 }}
                 </p>
-                <p class="text-xs text-asphalt-muted mt-1">ELO Rating</p>
+                <p class="mt-1 text-xs uppercase tracking-wide text-asphalt-muted">
+                  ELO Rating
+                </p>
               </div>
             </div>
           </div>
@@ -258,20 +266,13 @@ onMounted(() => {
                 type="tel"
               />
 
-              <div class="flex gap-3 pt-4 border-t border-asphalt-light">
-                <button
-                  type="submit"
-                  class="px-5 py-2 bg-racket text-white font-medium rounded-md hover:bg-racket-hover"
-                >
-                  <FontAwesomeIcon icon="save" class="mr-1" />
+              <div class="flex gap-3 border-t border-white/5 pt-5">
+                <button type="submit" class="btn-violet">
+                  <FontAwesomeIcon icon="save" />
                   Save
                 </button>
-                <button
-                  type="button"
-                  @click="cancelEdit"
-                  class="px-5 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt"
-                >
-                  <FontAwesomeIcon icon="times" class="mr-1" />
+                <button type="button" @click="cancelEdit" class="btn-glass">
+                  <FontAwesomeIcon icon="times" />
                   Cancel
                 </button>
               </div>
@@ -280,19 +281,16 @@ onMounted(() => {
         </div>
 
         <!-- Action Buttons Below Card -->
-        <div v-if="!isEditing" class="mt-6 flex flex-col sm:flex-row gap-3">
-          <button
-            @click="isEditing = true"
-            class="px-5 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt"
-          >
-            <FontAwesomeIcon icon="edit" class="mr-1" />
+        <div v-if="!isEditing" class="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+          <button @click="isEditing = true" class="btn-violet">
+            <FontAwesomeIcon icon="edit" />
             Edit Profile
           </button>
           <button
             @click="handleLogout"
-            class="px-5 py-2 bg-asphalt-light text-danger font-medium rounded-md hover:bg-asphalt"
+            class="btn-glass text-danger hover:text-danger"
           >
-            <FontAwesomeIcon icon="sign-out-alt" class="mr-1" />
+            <FontAwesomeIcon icon="sign-out-alt" />
             Logout
           </button>
           <button

@@ -1,7 +1,8 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import gamesService from "@/services/gamesService.js";
 import playersService from "@/services/playersService.js";
+import apiService from "@/services/apiService.js";
 import { useApiRequest } from "@/composables/useApiRequest.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
@@ -17,13 +18,16 @@ const processResult = ref(null);
 const actionLoadingByGameId = ref({});
 const processingGame = ref(false);
 let processCloseTimer = null;
+const historyGames = ref([]);
+const historyLoading = ref(false);
+const historyError = ref("");
 
 const {
   data: games,
   loading,
   error,
   execute: fetchGames,
-} = useApiRequest(() => gamesService.listPlannedGames(), {
+} = useApiRequest(() => gamesService.listAllGames(), {
   immediate: true,
   maxRetries: 1,
 });
@@ -69,6 +73,29 @@ const replaceGame = (gameId, patch) => {
   games.value = (games.value || []).map((game) =>
     game.id === gameId ? { ...game, ...patch } : game,
   );
+  historyGames.value = (historyGames.value || []).map((game) =>
+    game.id === gameId ? { ...game, ...patch } : game,
+  );
+};
+
+const fetchHistoryGames = async () => {
+  historyLoading.value = true;
+  historyError.value = "";
+  try {
+    const response = await apiService.getHistoricalGames();
+    const rawGames = response?.games || response || [];
+    historyGames.value = rawGames.filter((game) =>
+      ["ended", "processed"].includes((game.status || "").toLowerCase()),
+    );
+  } catch (err) {
+    historyError.value = err.message || "Failed to load games history";
+  } finally {
+    historyLoading.value = false;
+  }
+};
+
+const refreshAllGames = async () => {
+  await Promise.all([fetchGames(), fetchHistoryGames()]);
 };
 
 const refreshGameDetails = async (gameId) => {
@@ -120,23 +147,10 @@ const submitCreate = async () => {
       description: createForm.value.description || undefined,
       ...(plannedAt ? { plannedAt } : {}),
     };
-    try {
-      await gamesService.createGame(payload);
-    } catch (err) {
-      const isDateError = /date|time|plannedAt|planned/i.test(err.message || "");
-      if (!payload.plannedAt || !isDateError) throw err;
-      await gamesService.createGame({
-        name: payload.name,
-        description: payload.description,
-      });
-      showToast("success", "Game created without planned date");
-      showCreateModal.value = false;
-      await fetchGames();
-      return;
-    }
+    await gamesService.createGame(payload);
     showCreateModal.value = false;
     showToast("success", "Game created");
-    await fetchGames();
+    await refreshAllGames();
   } catch (err) {
     showToast("error", err.message || "Failed to create game");
   }
@@ -227,6 +241,7 @@ const runLifecycleAction = async (game, action) => {
     const updated = await actionMap[action](game.id);
     replaceGame(game.id, updated);
     await refreshGameDetails(game.id).catch(() => {});
+    await fetchHistoryGames();
     showToast("success", `Game ${action === "start" ? "started" : "ended"}`);
   } catch (err) {
     showToast("error", err.message || `Failed to ${action} game`);
@@ -242,6 +257,30 @@ const processForm = ref({
   scores: [],
 });
 
+const getNumericScore = (value) => {
+  if (value === "" || value == null) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const syncWinnerWithScores = () => {
+  const scored = processForm.value.scores
+    .map((score) => ({
+      userId: Number(score.userId),
+      score: getNumericScore(score.score),
+    }))
+    .filter((entry) => entry.score != null);
+
+  if (!scored.length) return;
+
+  const maxScore = Math.max(...scored.map((entry) => entry.score));
+  const leaders = scored.filter((entry) => entry.score === maxScore);
+  const currentWinnerId = Number(processForm.value.winnerId);
+
+  if (leaders.some((entry) => entry.userId === currentWinnerId)) return;
+  processForm.value.winnerId = String(leaders[0].userId);
+};
+
 const openProcessModal = (game) => {
   const participants = game.participants || [];
   if (processCloseTimer) {
@@ -251,13 +290,14 @@ const openProcessModal = (game) => {
   processResult.value = null;
   processForm.value = {
     game,
-    winnerId: participants[0]?.userId ? String(participants[0].userId) : "",
+    winnerId: "",
     scores: participants.map((participant) => ({
       userId: participant.userId,
       username: participant.username,
       score: "",
     })),
   };
+  syncWinnerWithScores();
   showProcessModal.value = true;
 };
 
@@ -298,6 +338,7 @@ const submitProcessGame = async () => {
 
   try {
     processingGame.value = true;
+    syncWinnerWithScores();
     if (!processForm.value.winnerId) {
       showToast("error", "Select a winner before processing");
       return;
@@ -325,6 +366,7 @@ const submitProcessGame = async () => {
       status: "processed",
       winnerUserId: payload.winnerId,
     });
+    await fetchHistoryGames();
     showToast("success", "Game processed");
     processCloseTimer = setTimeout(() => {
       showProcessModal.value = false;
@@ -347,11 +389,23 @@ const statusClasses = (status = "planned") => {
 
 const sortedGames = computed(() =>
   (games.value || []).slice().sort((a, b) => {
-    const aTs = a.plannedAt ? Date.parse(a.plannedAt) : 0;
-    const bTs = b.plannedAt ? Date.parse(b.plannedAt) : 0;
-    return aTs - bTs;
+    const aTs = Date.parse(a.endedAt || a.startedAt || a.plannedAt || a.createdAt || 0);
+    const bTs = Date.parse(b.endedAt || b.startedAt || b.plannedAt || b.createdAt || 0);
+    return bTs - aTs;
   }),
 );
+
+const sortedHistoryGames = computed(() =>
+  (historyGames.value || []).slice().sort((a, b) => {
+    const aTs = Date.parse(a.endedAt || a.startedAt || a.plannedAt || a.createdAt || 0);
+    const bTs = Date.parse(b.endedAt || b.startedAt || b.plannedAt || b.createdAt || 0);
+    return bTs - aTs;
+  }),
+);
+
+onMounted(() => {
+  fetchHistoryGames();
+});
 </script>
 
 <template>
@@ -362,12 +416,12 @@ const sortedGames = computed(() =>
           Games
         </p>
         <p class="text-sm text-snow-dim">
-          Create games, manage players, run the lifecycle, and process scores.
+          Create games, manage players, run lifecycle, and view full game history.
         </p>
       </div>
       <button
         type="button"
-        class="inline-flex items-center gap-2 rounded-md bg-racket px-3 py-2 text-xs font-medium text-white hover:bg-racket-hover"
+        class="inline-flex items-center gap-2 btn-violet text-xs"
         @click="openCreateModal"
       >
         <font-awesome-icon icon="plus" />
@@ -383,7 +437,7 @@ const sortedGames = computed(() =>
       {{ toast.message }}
     </div>
 
-    <div class="bg-charcoal rounded-xl border border-asphalt-light p-4 space-y-4">
+    <div class="glass-card p-4 space-y-4">
       <div class="flex items-center justify-between text-xs text-asphalt-muted">
         <span>
           {{ sortedGames.length }} game<span v-if="sortedGames.length !== 1">s</span>
@@ -391,7 +445,7 @@ const sortedGames = computed(() =>
         <button
           type="button"
           class="inline-flex items-center gap-2 text-snow-dim hover:text-snow"
-          @click="fetchGames"
+          @click="refreshAllGames"
         >
           <font-awesome-icon icon="arrow-rotate-right" />
           Refresh
@@ -414,8 +468,8 @@ const sortedGames = computed(() =>
         <div v-if="!sortedGames.length">
           <EmptyState
             icon="calendar-days"
-            title="No games planned"
-            message="Create a new game to start planning your next session."
+            title="No games found"
+            message="Create a new game to get started. Ended and processed games show here too."
             action-label="Create game"
             action-icon="plus"
             @action="openCreateModal"
@@ -426,7 +480,7 @@ const sortedGames = computed(() =>
           <div
             v-for="game in sortedGames"
             :key="game.id"
-            class="rounded-lg border border-asphalt-light bg-charcoal overflow-hidden"
+            class="rounded-lg border border-white/5 bg-charcoal overflow-hidden"
           >
             <button
               type="button"
@@ -463,9 +517,9 @@ const sortedGames = computed(() =>
               </div>
             </button>
 
-            <div v-if="expandedGameIds.has(game.id)" class="border-t border-asphalt-light">
+            <div v-if="expandedGameIds.has(game.id)" class="border-t border-white/5">
               <div class="grid gap-4 p-4 lg:grid-cols-[1.1fr,0.9fr]">
-                <div class="rounded-lg border border-asphalt-light bg-asphalt/30 p-3">
+                <div class="rounded-lg border border-white/5 bg-asphalt/30 p-3">
                   <p class="text-xs uppercase tracking-wide text-asphalt-muted mb-2">
                     Players in game
                   </p>
@@ -499,14 +553,14 @@ const sortedGames = computed(() =>
                 </div>
 
                 <div class="space-y-3">
-                  <div class="rounded-lg border border-asphalt-light bg-asphalt/30 p-3">
+                  <div class="rounded-lg border border-white/5 bg-asphalt/30 p-3">
                     <p class="text-xs uppercase tracking-wide text-asphalt-muted mb-2">
                       Game actions
                     </p>
                     <div class="flex flex-wrap gap-2 text-xs">
                       <button
                         type="button"
-                        class="rounded bg-racket px-3 py-2 text-white hover:bg-racket-hover disabled:cursor-not-allowed disabled:opacity-40"
+                        class="btn-violet text-xs disabled:cursor-not-allowed disabled:opacity-40"
                         :disabled="(game.status || 'planned') !== 'planned' || isActionLoading(game.id, 'start')"
                         @click="runLifecycleAction(game, 'start')"
                       >
@@ -549,7 +603,7 @@ const sortedGames = computed(() =>
                     </p>
                   </div>
 
-                  <div class="rounded-lg border border-asphalt-light bg-asphalt/30 p-3">
+                  <div class="rounded-lg border border-white/5 bg-asphalt/30 p-3">
                     <p class="text-xs uppercase tracking-wide text-asphalt-muted mb-2">
                       Add player
                     </p>
@@ -573,7 +627,7 @@ const sortedGames = computed(() =>
                     </div>
                   </div>
 
-                  <div class="border border-asphalt-light rounded-lg p-2 min-h-[3rem]">
+                  <div class="border border-white/5 rounded-lg p-2 min-h-[3rem]">
                     <div
                       v-if="playerSearchLoadingByGameId[game.id]"
                       class="flex items-center gap-2 text-xs text-snow-dim"
@@ -628,7 +682,7 @@ const sortedGames = computed(() =>
 
               <div
                 v-if="schedulesByGameId[game.id]?.rounds?.length"
-                class="border-t border-asphalt-light p-4"
+                class="border-t border-white/5 p-4"
               >
                 <p class="mb-3 text-xs uppercase tracking-wide text-asphalt-muted">
                   Schedule
@@ -637,7 +691,7 @@ const sortedGames = computed(() =>
                   <div
                     v-for="round in schedulesByGameId[game.id].rounds"
                     :key="round.round"
-                    class="rounded-lg border border-asphalt-light bg-asphalt/40 p-3 text-xs"
+                    class="rounded-lg border border-white/5 bg-asphalt/40 p-3 text-xs"
                   >
                     <p class="mb-2 font-medium text-snow">
                       Round {{ round.round }}
@@ -645,7 +699,7 @@ const sortedGames = computed(() =>
                     <div
                       v-for="match in round.matches"
                       :key="`${round.round}-${match.field}`"
-                      class="flex justify-between gap-3 border-t border-asphalt-light py-2 first:border-t-0 first:pt-0"
+                      class="flex justify-between gap-3 border-t border-white/5 py-2 first:border-t-0 first:pt-0"
                     >
                       <span class="text-snow-dim">Field {{ match.field }}</span>
                       <span class="text-right text-snow">
@@ -668,13 +722,97 @@ const sortedGames = computed(() =>
       </div>
     </div>
 
+    <div class="glass-card p-4 space-y-4">
+      <div class="flex items-center justify-between text-xs text-asphalt-muted">
+        <span>
+          Games History ({{ sortedHistoryGames.length }})
+        </span>
+      </div>
+
+      <div v-if="historyLoading" class="py-12 flex justify-center">
+        <LoadingSpinner size="6" />
+      </div>
+
+      <ErrorMessage
+        v-else-if="historyError"
+        :title="'Failed to load games history'"
+        :message="historyError"
+        retry-label="Retry"
+        @retry="fetchHistoryGames"
+      />
+
+      <div v-else-if="!sortedHistoryGames.length">
+        <EmptyState
+          icon="clipboard-list"
+          title="No historical games yet"
+          message="Ended and processed games appear here."
+        />
+      </div>
+
+      <div v-else class="space-y-3">
+        <div
+          v-for="game in sortedHistoryGames"
+          :key="`history-${game.id}`"
+          class="rounded-lg border border-white/5 bg-charcoal overflow-hidden"
+        >
+          <button
+            type="button"
+            class="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-asphalt-light/60"
+            @click="toggleExpand(game)"
+          >
+            <div class="flex items-center gap-3">
+              <font-awesome-icon
+                :icon="expandedGameIds.has(game.id) ? 'chevron-down' : 'chevron-right'"
+                class="text-xs text-asphalt-muted"
+              />
+              <div>
+                <p class="text-sm font-medium text-snow">
+                  {{ game.name || "Unnamed Game" }}
+                </p>
+                <p class="text-xs text-asphalt-muted">
+                  {{ game.description || "No description" }}
+                </p>
+                <p class="mt-1 text-[11px] text-asphalt-muted">
+                  {{ formatDate(game.endedAt || game.startedAt || game.createdAt) || "-" }}
+                </p>
+              </div>
+            </div>
+            <span
+              class="rounded-full px-2 py-0.5 text-xs font-medium capitalize"
+              :class="statusClasses(game.status)"
+            >
+              {{ game.status || "ended" }}
+            </span>
+          </button>
+
+          <div v-if="expandedGameIds.has(game.id)" class="border-t border-white/5 p-4">
+            <p class="text-xs uppercase tracking-wide text-asphalt-muted mb-2">
+              Players
+            </p>
+            <ParticipantsList
+              :participants="game.participants || []"
+              :winner-user-id="game.winnerUserId"
+              :show-score="true"
+              display-field="elo"
+            />
+            <p
+              v-if="loadingDetailsFor === game.id"
+              class="mt-3 text-[11px] text-asphalt-muted"
+            >
+              Loading game details...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Create game modal -->
     <div
       v-if="showCreateModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-court/80"
       @click.self="showCreateModal = false"
     >
-      <div class="w-full max-w-md rounded-lg bg-charcoal p-5 border border-asphalt-light">
+      <div class="w-full max-w-md glass-card p-5">
         <h3 class="text-lg font-semibold text-snow mb-4">
           Create game
         </h3>
@@ -708,7 +846,7 @@ const sortedGames = computed(() =>
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded bg-racket px-3 py-2 text-white hover:bg-racket-hover"
+            class="inline-flex items-center gap-2 btn-violet text-xs"
             @click="submitCreate"
           >
             <font-awesome-icon icon="check" />
@@ -724,7 +862,7 @@ const sortedGames = computed(() =>
       class="fixed inset-0 z-50 flex items-center justify-center bg-court/80 px-4"
       @click.self="closeProcessModal"
     >
-      <div class="w-full max-w-xl rounded-lg bg-charcoal p-5 border border-asphalt-light">
+      <div class="w-full max-w-xl glass-card p-5">
         <h3 class="text-lg font-semibold text-snow mb-1">
           Process scores
         </h3>
@@ -741,7 +879,7 @@ const sortedGames = computed(() =>
             <select
               id="winner-id"
               v-model="processForm.winnerId"
-              class="mt-1 block w-full rounded-md border border-asphalt-light bg-asphalt px-3 py-2 text-snow shadow-sm focus:border-racket focus:outline-none focus:ring-racket"
+              class="mt-1 block w-full rounded-md border border-white/5 bg-asphalt px-3 py-2 text-snow shadow-sm focus:border-racket focus:outline-none focus:ring-racket"
             >
               <option
                 v-for="score in processForm.scores"
@@ -760,7 +898,7 @@ const sortedGames = computed(() =>
             <div
               v-for="score in processForm.scores"
               :key="score.userId"
-              class="grid grid-cols-[1fr,7rem] items-center gap-3 rounded border border-asphalt-light bg-asphalt/40 px-3 py-2"
+              class="grid grid-cols-[1fr,7rem] items-center gap-3 rounded border border-white/5 bg-asphalt/40 px-3 py-2"
             >
               <span class="text-sm text-snow">{{ score.username }}</span>
               <input
@@ -769,15 +907,16 @@ const sortedGames = computed(() =>
                 min="0"
                 step="1"
                 required
-                class="rounded-md border border-asphalt-light bg-asphalt px-3 py-2 text-sm text-snow focus:border-racket focus:outline-none"
+                class="rounded-md border border-white/5 bg-asphalt px-3 py-2 text-sm text-snow focus:border-racket focus:outline-none"
                 placeholder="0"
+                @input="syncWinnerWithScores"
               />
             </div>
           </div>
 
           <div
             v-if="processResult?.eloChanges?.length"
-            class="rounded-lg border border-asphalt-light bg-asphalt/40 p-3"
+            class="rounded-lg border border-white/5 bg-asphalt/40 p-3"
           >
             <p class="mb-2 text-xs uppercase tracking-wide text-asphalt-muted">
               ELO changes
@@ -808,7 +947,7 @@ const sortedGames = computed(() =>
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded bg-racket px-3 py-2 text-white hover:bg-racket-hover disabled:cursor-not-allowed disabled:opacity-50"
+            class="inline-flex items-center gap-2 btn-violet text-xs disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="processingGame"
             @click="submitProcessGame"
           >

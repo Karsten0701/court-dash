@@ -11,7 +11,9 @@ const emit = defineEmits(["retry"]);
 </script>
 
 <template>
-  <div class="bg-danger-surface border border-danger-border rounded-lg p-6">
+  <div
+    class="rounded-2xl border border-danger-border/60 bg-danger-surface/70 p-6 shadow-card backdrop-blur-xl"
+  >
     <div class="flex">
       <div class="flex-shrink-0">
         <font-awesome-icon icon="circle-xmark" class="h-5 w-5 text-danger" />
@@ -19,7 +21,6 @@ const emit = defineEmits(["retry"]);
       <div class="ml-3 flex-1">
         <h3 class="text-sm font-medium text-danger">{{ title }}</h3>
         <p v-if="hint" class="mt-2 text-sm text-danger">{{ hint }}</p>
-        <!-- slot for extra hint/detail text -->
         <slot />
         <details class="mt-2 group">
           <summary
@@ -49,7 +50,6 @@ const emit = defineEmits(["retry"]);
             <font-awesome-icon :icon="retryIcon" class="mr-1" />
             {{ retryLabel }}
           </button>
-          <!-- slot for extra action buttons (e.g. navigate, dismiss) -->
           <slot name="actions" />
         </div>
       </div>

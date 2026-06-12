@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
   faArrowLeft,
   faArrowRotateRight,
+  faBars,
   faBolt,
   faBug,
   faCalendarDays,
@@ -51,6 +52,7 @@ import {
 library.add(
   faArrowLeft,
   faArrowRotateRight,
+  faBars,
   faBolt,
   faBug,
   faCalendarDays,

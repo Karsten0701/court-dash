@@ -72,7 +72,7 @@ onMounted(() => {
       </button>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="bg-charcoal rounded-lg p-6 animate-pulse">
+      <div v-if="isLoading" class="glass-card p-6 animate-pulse">
         <div class="h-6 bg-asphalt-light rounded w-1/3 mb-4"></div>
         <div class="h-4 bg-asphalt-light rounded w-2/3 mb-6"></div>
         <div class="h-4 bg-asphalt-light rounded w-1/2"></div>
@@ -107,9 +107,11 @@ onMounted(() => {
       <!-- Game Details -->
       <div v-else-if="game" class="space-y-6">
         <!-- Game Header -->
-        <div class="bg-charcoal rounded-lg p-6">
+        <div class="glass-card p-6">
           <div class="flex justify-between items-start mb-4">
-            <h1 class="text-3xl font-bold text-snow">
+            <h1
+              class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-3xl font-extrabold tracking-tight text-transparent"
+            >
               {{ game.name }}
             </h1>
             <span
@@ -130,7 +132,7 @@ onMounted(() => {
         </div>
 
         <!-- Scoreboard -->
-        <div class="bg-charcoal rounded-lg p-6">
+        <div class="glass-card p-6">
           <h2 class="text-xl font-bold text-snow mb-4">Scoreboard</h2>
           <PlayerList
             :participants="game.participants || []"

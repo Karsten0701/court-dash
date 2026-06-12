@@ -2,11 +2,14 @@
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AdminHeader from "./components/AdminHeader.vue";
+import LandingHeader from "./components/LandingHeader.vue";
+import LandingFooter from "./components/LandingFooter.vue";
 
 const route = useRoute();
 const router = useRouter();
 const isInitialLoad = ref(true);
 const showAdminShell = computed(() => route.meta.requiresAuth);
+const showLandingShell = computed(() => route.meta.isLanding);
 
 router.isReady().then(() => {
   setTimeout(() => {
@@ -18,11 +21,14 @@ router.isReady().then(() => {
 <template>
   <div class="min-h-screen bg-court text-snow">
     <AdminHeader v-if="showAdminShell" />
+    <LandingHeader v-else-if="showLandingShell" />
 
     <main
       :class="showAdminShell
         ? 'max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-10'
-        : 'min-h-screen'"
+        : showLandingShell
+          ? ''
+          : 'min-h-screen'"
     >
       <router-view v-slot="{ Component, route }">
         <Transition :name="isInitialLoad ? '' : 'page'" mode="out-in">
@@ -30,6 +36,8 @@ router.isReady().then(() => {
         </Transition>
       </router-view>
     </main>
+
+    <LandingFooter v-if="showLandingShell" />
   </div>
 </template>
 
@@ -44,11 +52,9 @@ router.isReady().then(() => {
 
 .page-enter-from {
   opacity: 0;
-  /* transform: translateX(20px); */
 }
 
 .page-leave-to {
   opacity: 0;
-  /* transform: translateX(-20px); */
 }
 </style>
