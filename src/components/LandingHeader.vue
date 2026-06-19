@@ -7,9 +7,9 @@ const router = useRouter();
 const menuOpen = ref(false);
 
 const links = [
-  { id: "home", label: "Home" },
-  { id: "how-it-works", label: "How it works" },
-  { id: "faq", label: "FAQ" },
+  { id: "home", labelKey: "nav.home" },
+  { id: "how-it-works", labelKey: "nav.howItWorks" },
+  { id: "faq", labelKey: "nav.faq" },
 ];
 
 const scrollTo = (id) => {
@@ -50,7 +50,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
         <span class="text-sm font-semibold text-snow">{{ appConfig.name }}</span>
       </button>
 
-      <nav class="hidden items-center gap-1 md:flex" aria-label="Landing">
+      <nav class="hidden items-center gap-1 md:flex" :aria-label="$t('nav.landing')">
         <button
           v-for="link in links"
           :key="link.id"
@@ -58,19 +58,19 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
           class="rounded-full px-3 py-2 text-sm font-medium text-snow-dim transition-colors hover:bg-white/5 hover:text-snow"
           @click="scrollTo(link.id)"
         >
-          {{ link.label }}
+          {{ $t(link.labelKey) }}
         </button>
       </nav>
 
       <div class="flex items-center gap-2">
         <router-link to="/login" class="btn-violet text-xs sm:text-sm">
           <font-awesome-icon icon="sign-in-alt" />
-          Log in
+          {{ $t("nav.login") }}
         </router-link>
         <button
           type="button"
           class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-snow-dim transition-colors hover:bg-white/5 hover:text-snow md:hidden"
-          aria-label="Open menu"
+          :aria-label="$t('nav.openMenu')"
           @click="menuOpen = !menuOpen"
         >
           <font-awesome-icon :icon="menuOpen ? 'times' : 'bars'" />
@@ -90,7 +90,7 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
           class="rounded-xl px-3 py-2.5 text-left text-sm font-medium text-snow-dim transition-colors hover:bg-white/5 hover:text-snow"
           @click="scrollTo(link.id)"
         >
-          {{ link.label }}
+          {{ $t(link.labelKey) }}
         </button>
       </div>
     </div>

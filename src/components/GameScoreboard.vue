@@ -20,13 +20,13 @@ const sortedParticipants = computed(() => {
 
 <template>
   <div class="glass-card p-6">
-    <h2 class="text-lg font-semibold text-snow mb-4">Scoreboard</h2>
+    <h2 class="text-lg font-semibold text-snow mb-4">{{ $t("games.scoreBoard") }}</h2>
 
     <div
       v-if="sortedParticipants.length === 0"
       class="text-sm text-asphalt-muted text-center py-4"
     >
-      No participants recorded.
+      {{ $t("games.noParticipants") }}
     </div>
 
     <div v-else class="overflow-x-auto">
@@ -34,8 +34,8 @@ const sortedParticipants = computed(() => {
         <thead>
           <tr class="border-b border-white/5">
             <th class="pb-3 text-xs text-asphalt-muted w-16">#</th>
-            <th class="pb-3 text-xs text-asphalt-muted">Player</th>
-            <th class="pb-3 text-xs text-asphalt-muted text-right">Score</th>
+            <th class="pb-3 text-xs text-asphalt-muted">{{ $t("games.player") }}</th>
+            <th class="pb-3 text-xs text-asphalt-muted text-right">{{ $t("common.score") }}</th>
           </tr>
         </thead>
         <tbody>

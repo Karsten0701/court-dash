@@ -10,6 +10,7 @@ import {
   Tooltip,
   Filler,
 } from "chart.js";
+import { currentLocale, t } from "@/i18n";
 
 Chart.register(
   LineController,
@@ -34,7 +35,10 @@ const hasHistory = () =>
 
 const formatDate = (dateStr) => {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return d.toLocaleDateString(currentLocale.value, {
+    month: "short",
+    day: "numeric",
+  });
 };
 
 const createChart = () => {
@@ -94,7 +98,7 @@ const createChart = () => {
               const idx = items[0].dataIndex;
               return gameNames[idx] || labels[idx];
             },
-            label: (item) => `ELO: ${item.raw}`,
+            label: (item) => t("chart.tooltipLabel", { elo: item.raw }),
           },
         },
         legend: { display: false },
@@ -133,6 +137,11 @@ watch(
   },
   { deep: true },
 );
+
+watch(currentLocale, () => {
+  destroyChart();
+  createChart();
+});
 </script>
 
 <template>
@@ -147,7 +156,7 @@ watch(
     <div v-if="!nested" class="mb-5 flex items-center justify-between gap-3">
       <div>
         <p class="text-xs font-semibold uppercase tracking-wide text-snow-dim">
-          Current ELO
+          {{ $t("chart.currentElo") }}
         </p>
         <p
           class="mt-1 bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-3xl font-extrabold text-transparent"
@@ -168,7 +177,7 @@ watch(
       v-else
       class="flex items-center justify-center h-64 text-asphalt-muted"
     >
-      No ELO history yet
+      {{ $t("chart.noHistory") }}
     </div>
   </div>
 </template>

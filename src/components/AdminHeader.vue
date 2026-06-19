@@ -3,14 +3,15 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import appConfig from "@/config/appConfig";
 import authService from "@/services/authService.js";
+import { t } from "@/i18n";
 
 const route = useRoute();
 const router = useRouter();
 
 const tabs = [
-  { to: "/dashboard", label: "Overview", name: "Dashboard", icon: "house" },
-  { to: "/players", label: "Players", name: "Players", icon: "users" },
-  { to: "/games", label: "Games", name: "Games", icon: "table-tennis-paddle-ball" },
+  { to: "/dashboard", labelKey: "nav.overview", name: "Dashboard", icon: "house" },
+  { to: "/players", labelKey: "nav.players", name: "Players", icon: "users" },
+  { to: "/games", labelKey: "nav.games", name: "Games", icon: "table-tennis-paddle-ball" },
 ];
 
 const activeTabName = computed(() => route.name);
@@ -22,8 +23,10 @@ const userInitial = computed(() =>
 );
 
 const pageTitle = computed(() => {
-  if (route.name === "Dashboard") return "Overview";
-  return route.name || "Dashboard";
+  if (route.name === "Dashboard") return t("nav.overview");
+  if (route.name === "Players") return t("nav.players");
+  if (route.name === "Games") return t("nav.games");
+  return route.name || t("nav.dashboard");
 });
 
 const handleLogout = async () => {
@@ -61,7 +64,7 @@ const handleLogout = async () => {
       <div class="flex items-center justify-between gap-3">
         <nav
           class="flex flex-1 justify-start lg:justify-end gap-1 text-sm"
-          aria-label="Main navigation"
+          :aria-label="$t('nav.main')"
         >
           <router-link
             v-for="tab in tabs"
@@ -73,7 +76,7 @@ const handleLogout = async () => {
             }"
           >
             <font-awesome-icon :icon="tab.icon" class="text-[11px] lg:text-xs" />
-            <span class="font-medium">{{ tab.label }}</span>
+            <span class="font-medium">{{ $t(tab.labelKey) }}</span>
           </router-link>
         </nav>
 
@@ -89,9 +92,9 @@ const handleLogout = async () => {
           </span>
           <div class="leading-tight text-left">
             <p class="font-medium text-snow text-xs">
-              {{ currentUser?.name || "Admin" }}
+              {{ currentUser?.name || $t("players.admin") }}
             </p>
-            <p class="text-[10px] text-asphalt-muted">Logout</p>
+            <p class="text-[10px] text-asphalt-muted">{{ $t("nav.logout") }}</p>
           </div>
         </button>
       </div>

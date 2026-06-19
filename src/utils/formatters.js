@@ -8,7 +8,7 @@
 export const formatDate = (dateString, options) => {
   if (!dateString) return null;
   return new Date(dateString).toLocaleDateString(
-    undefined,
+    currentLocale.value,
     options || {
       year: "numeric",
       month: "short",
@@ -50,3 +50,4 @@ export const getStatusBorderColor = (status) => {
   };
   return map[status?.toLowerCase()] || "#2e2e2e";
 };
+import { currentLocale } from "@/i18n";

@@ -7,6 +7,7 @@ import ErrorMessage from "@/components/ErrorMessage.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import FormInput from "@/components/FormInput.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { currentLocale, t } from "@/i18n";
 
 const router = useRouter();
 const isLoading = ref(true);
@@ -27,7 +28,7 @@ const fetchUserData = async () => {
 
     const currentUser = authService.getCurrentUser();
     if (!currentUser || !currentUser.id) {
-      throw new Error("User not found");
+      throw new Error(t("account.userNotFound"));
     }
 
     const response = await apiService.getUserById(currentUser.id);
@@ -43,14 +44,14 @@ const fetchUserData = async () => {
     console.error("Failed to fetch user data:", err);
 
     // If 401, token is invalid - redirect to login
-    if (err.message.includes("401") || err.message.includes("Unauthorized")) {
+    if (err.message.includes("401") || err.message.includes(t("errors.unauthorized"))) {
       await authService.logout();
       router.push({ name: "Login", query: { redirect: "/account" } });
       return;
     } else if (err.status === 500) {
-      error.value = "Something went wrong. Please try again later.";
+      error.value = t("errors.generic");
     } else {
-      error.value = err.message || "Failed to load account information";
+      error.value = err.message || t("account.loadFailed");
     }
   } finally {
     isLoading.value = false;
@@ -69,7 +70,7 @@ const handleUpdateProfile = async () => {
     isEditing.value = false;
   } catch (err) {
     console.error("Failed to update profile:", err);
-    error.value = err.message || "Failed to update profile";
+    error.value = err.message || t("account.updateProfileFailed");
   }
 };
 
@@ -105,7 +106,7 @@ const handleDeleteAccount = async () => {
     router.push({ name: "Home" });
   } catch (err) {
     console.error("Failed to delete account:", err);
-    error.value = err.message || "Failed to delete account";
+    error.value = err.message || t("account.deleteFailed");
   } finally {
     showDeleteConfirm.value = false;
   }
@@ -127,9 +128,9 @@ onMounted(() => {
         <h1
           class="bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-4xl font-extrabold tracking-tight text-transparent"
         >
-          Account
+          {{ $t("account.title") }}
         </h1>
-        <p class="text-snow-dim text-sm mt-2">Manage your profile</p>
+        <p class="text-snow-dim text-sm mt-2">{{ $t("account.subtitle") }}</p>
       </div>
 
       <!-- Loading Skeleton -->
@@ -143,10 +144,10 @@ onMounted(() => {
       <!-- Error State -->
       <ErrorMessage
         v-else-if="error && !user"
-        title="Error loading account"
+        :title="$t('account.errorTitle')"
         :message="error"
-        hint="We couldn't load your profile. Please try again."
-        retry-label="Try again"
+        :hint="$t('account.errorHint')"
+        :retry-label="$t('common.retry')"
         @retry="fetchUserData"
       />
 
@@ -159,52 +160,52 @@ onMounted(() => {
               <!-- Profile Fields -->
               <div class="flex-1 space-y-5">
                 <div>
-                  <p class="text-xs text-asphalt-muted mb-1">Name</p>
+                  <p class="text-xs text-asphalt-muted mb-1">{{ $t("account.name") }}</p>
                   <p class="text-snow">
-                    {{ user.username || user.name || "N/A" }}
+                    {{ user.username || user.name || $t("common.notAvailable") }}
                   </p>
                 </div>
 
                 <div>
-                  <p class="text-xs text-asphalt-muted mb-1">Email</p>
+                  <p class="text-xs text-asphalt-muted mb-1">{{ $t("account.email") }}</p>
                   <p class="text-snow">
-                    {{ user.email || "N/A" }}
+                    {{ user.email || $t("common.notAvailable") }}
                   </p>
                 </div>
 
                 <div>
-                  <p class="text-xs text-asphalt-muted mb-1">Phone Number</p>
+                  <p class="text-xs text-asphalt-muted mb-1">{{ $t("account.phoneNumber") }}</p>
                   <p class="text-snow">
-                    {{ user.phone_number || "Not set" }}
+                    {{ user.phone_number || $t("common.notSet") }}
                   </p>
                 </div>
 
                 <div class="sm:hidden">
-                  <p class="text-xs text-asphalt-muted mb-1">ELO Rating</p>
+                  <p class="text-xs text-asphalt-muted mb-1">{{ $t("common.eloRating") }}</p>
                   <p class="text-snow font-semibold">{{ user.elo ?? 1000 }}</p>
                 </div>
 
                 <div v-if="isAdmin()">
-                  <p class="text-xs text-asphalt-muted mb-1">Account Type</p>
+                  <p class="text-xs text-asphalt-muted mb-1">{{ $t("account.accountType") }}</p>
                   <p class="text-snow capitalize">
-                    {{ user.role || "User" }}
+                    {{ user.role || $t("players.user") }}
                   </p>
                 </div>
 
                 <div>
-                  <p class="text-xs text-asphalt-muted mb-1">Member Since</p>
+                  <p class="text-xs text-asphalt-muted mb-1">{{ $t("account.memberSince") }}</p>
                   <p class="text-snow">
                     {{
                       user.createdAt
                         ? new Date(user.createdAt).toLocaleDateString(
-                            undefined,
+                            currentLocale,
                             {
                               year: "numeric",
                               month: "long",
                               day: "numeric",
                             },
                           )
-                        : "N/A"
+                        : $t("common.notAvailable")
                     }}
                   </p>
                 </div>
@@ -227,7 +228,7 @@ onMounted(() => {
                   {{ user.elo ?? 1000 }}
                 </p>
                 <p class="mt-1 text-xs uppercase tracking-wide text-asphalt-muted">
-                  ELO Rating
+                  {{ $t("common.eloRating") }}
                 </p>
               </div>
             </div>
@@ -238,10 +239,10 @@ onMounted(() => {
             <form @submit.prevent="handleUpdateProfile" class="space-y-6">
               <ErrorMessage
                 v-if="error"
-                title="Update failed"
+                :title="$t('account.updateFailed')"
                 :message="error"
-                hint="Your changes couldn't be saved. Please try again."
-                retry-label="Dismiss"
+                :hint="$t('account.updateHint')"
+                :retry-label="$t('common.dismiss')"
                 retry-icon="times"
                 @retry="error = ''"
               />
@@ -249,31 +250,31 @@ onMounted(() => {
               <FormInput
                 id="username"
                 v-model="editForm.username"
-                label="Name"
+                :label="$t('account.name')"
                 required
               />
               <FormInput
                 id="email"
                 v-model="editForm.email"
-                label="Email"
+                :label="$t('account.email')"
                 type="email"
                 required
               />
               <FormInput
                 id="phone_number"
                 v-model="editForm.phone_number"
-                label="Phone Number"
+                :label="$t('account.phoneNumber')"
                 type="tel"
               />
 
               <div class="flex gap-3 border-t border-white/5 pt-5">
                 <button type="submit" class="btn-violet">
                   <FontAwesomeIcon icon="save" />
-                  Save
+                  {{ $t("common.save") }}
                 </button>
                 <button type="button" @click="cancelEdit" class="btn-glass">
                   <FontAwesomeIcon icon="times" />
-                  Cancel
+                  {{ $t("common.cancel") }}
                 </button>
               </div>
             </form>
@@ -284,14 +285,14 @@ onMounted(() => {
         <div v-if="!isEditing" class="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
           <button @click="isEditing = true" class="btn-violet">
             <FontAwesomeIcon icon="edit" />
-            Edit Profile
+            {{ $t("account.editProfile") }}
           </button>
           <button
             @click="handleLogout"
             class="btn-glass text-danger hover:text-danger"
           >
             <FontAwesomeIcon icon="sign-out-alt" />
-            Logout
+            {{ $t("nav.logout") }}
           </button>
           <button
             @click="showDeleteConfirm = true"
@@ -304,11 +305,11 @@ onMounted(() => {
             ]"
             :title="
               isAdmin()
-                ? 'Admins cannot delete their own account'
-                : 'Delete account'
+                ? $t('auth.adminRequired')
+                : $t('account.deleteAccount')
             "
           >
-            Delete Account
+            {{ $t("account.deleteAccount") }}
           </button>
         </div>
       </div>

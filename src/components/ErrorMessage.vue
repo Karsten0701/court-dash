@@ -30,7 +30,7 @@ const emit = defineEmits(["retry"]);
               icon="chevron-right"
               class="text-[10px] transition-transform group-open:rotate-90"
             />
-            Technical details
+            {{ $t("common.technicalDetails") }}
           </summary>
           <p
             class="mt-1 text-xs text-asphalt-muted font-mono break-all leading-relaxed"

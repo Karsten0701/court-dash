@@ -6,6 +6,7 @@ import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import FormInput from "@/components/FormInput.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { t } from "@/i18n";
 
 const router = useRouter();
 const formData = ref({
@@ -27,17 +28,17 @@ const handleSignup = async () => {
     !formData.value.email ||
     !formData.value.password
   ) {
-    error.value = "Please fill in all required fields";
+    error.value = t("auth.requiredFields");
     return;
   }
 
   if (formData.value.password !== formData.value.confirmPassword) {
-    error.value = "Passwords do not match";
+    error.value = t("auth.passwordsMismatch");
     return;
   }
 
   if (formData.value.password.length < 6) {
-    error.value = "Password must be at least 6 characters";
+    error.value = t("auth.passwordTooShort");
     return;
   }
 
@@ -63,14 +64,14 @@ const handleSignup = async () => {
   } catch (err) {
     // Check for different error types
     if (err.message.includes("429") || err.message.includes("rate limit")) {
-      error.value = "Rate limited. Please try again later.";
+      error.value = t("auth.rateLimited");
     } else if (err.message.includes("400")) {
-      error.value = "Invalid information provided. Please check your details.";
+      error.value = t("auth.invalidInfo");
     } else if (err.message.includes("500")) {
-      error.value = "Something went wrong. Please try again later.";
+      error.value = t("errors.generic");
     } else {
       error.value =
-        err.message || "Failed to create account. Please try again.";
+        err.message || t("auth.createFailed");
     }
     console.error("Signup error:", err);
   } finally {
@@ -86,15 +87,15 @@ const handleSignup = async () => {
     <div class="max-w-md w-full space-y-8">
       <div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-snow">
-          Create your account
+          {{ $t("auth.signupTitle") }}
         </h2>
         <p class="mt-2 text-center text-sm text-snow-dim">
-          Already have an account?
+          {{ $t("auth.signupPrompt") }}
           <router-link
             to="/login"
             class="font-medium text-racket hover:text-racket-hover"
           >
-            Sign in
+            {{ $t("auth.signIn") }}
           </router-link>
         </p>
       </div>
@@ -104,49 +105,49 @@ const handleSignup = async () => {
           <FormInput
             id="username"
             v-model="formData.username"
-            label="Name"
+            :label="$t('auth.name')"
             :required="true"
             :disabled="isLoading"
-            placeholder="Name"
+            :placeholder="$t('auth.name')"
           />
           <FormInput
             id="email"
             v-model="formData.email"
-            label="Email"
+            :label="$t('auth.email')"
             type="email"
             :required="true"
             :disabled="isLoading"
-            placeholder="Email address"
+            :placeholder="$t('auth.emailPlaceholder')"
           />
           <FormInput
             id="phone_number"
             v-model="formData.phone_number"
-            label="Phone Number"
+            :label="$t('auth.phoneNumber')"
             type="tel"
             :disabled="isLoading"
-            placeholder="Phone Number"
+            :placeholder="$t('auth.phoneNumber')"
           />
           <FormInput
             id="password"
             v-model="formData.password"
-            label="Password"
+            :label="$t('auth.password')"
             type="password"
             :required="true"
             :disabled="isLoading"
-            placeholder="Password (min 6 characters)"
+            :placeholder="$t('auth.passwordMinPlaceholder')"
           />
           <FormInput
             id="confirmPassword"
             v-model="formData.confirmPassword"
-            label="Confirm Password"
+            :label="$t('auth.confirmPassword')"
             type="password"
             :required="true"
             :disabled="isLoading"
-            placeholder="Confirm Password"
+            :placeholder="$t('auth.confirmPasswordPlaceholder')"
           />
         </div>
 
-        <ErrorMessage v-if="error" title="Signup failed" :message="error" :hint="error" />
+        <ErrorMessage v-if="error" :title="$t('auth.signupFailed')" :message="error" :hint="error" />
 
         <div>
           <button
@@ -156,7 +157,7 @@ const handleSignup = async () => {
           >
             <LoadingSpinner v-if="isLoading" class="text-white" />
             <font-awesome-icon v-else icon="user-plus" />
-            <span>{{ isLoading ? "Creating account..." : "Sign up" }}</span>
+            <span>{{ isLoading ? $t("auth.creatingAccount") : $t("auth.signUp") }}</span>
           </button>
         </div>
       </form>

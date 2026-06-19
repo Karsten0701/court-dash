@@ -7,6 +7,7 @@ import EmptyState from "@/components/EmptyState.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import EloChart from "@/components/EloChart.vue";
 import { formatDate } from "@/utils/formatters.js";
+import { t } from "@/i18n";
 
 const router = useRouter();
 const route = useRoute();
@@ -24,7 +25,7 @@ const isOwnProfile = computed(
   () => Number(profileId.value) === Number(currentUser.value?.id),
 );
 const displayName = computed(
-  () => player.value?.name || player.value?.username || "Unknown player",
+  () => player.value?.name || player.value?.username || t("profile.unknownPlayer"),
 );
 const memberSince = computed(() =>
   player.value?.createdAt
@@ -33,7 +34,7 @@ const memberSince = computed(() =>
         month: "long",
         day: "numeric",
       })
-    : "N/A",
+    : t("common.notAvailable"),
 );
 const profileInitial = computed(
   () => displayName.value.charAt(0).toUpperCase() || "?",
@@ -87,18 +88,18 @@ const fetchProfile = async () => {
     if (
       err.status === 401 ||
       err.message?.includes("401") ||
-      err.message?.includes("Unauthorized")
+      err.message?.includes(t("errors.unauthorized"))
     ) {
       await redirectToLogin();
       return;
     }
 
     if (err.status === 404) {
-      error.value = "Player not found";
+      error.value = t("profile.playerNotFound");
     } else if (err.status === 500) {
-      error.value = "Something went wrong. Please try again later.";
+      error.value = t("errors.generic");
     } else {
-      error.value = err.message || "Failed to load player profile";
+      error.value = err.message || t("profile.loadFailed");
     }
   } finally {
     isLoading.value = false;
@@ -127,7 +128,7 @@ onMounted(() => {
         @click="goBack"
       >
         <font-awesome-icon icon="arrow-left" class="mr-2" />
-        Back
+        {{ $t("common.back") }}
       </button>
 
       <!-- Loading skeleton -->
@@ -157,9 +158,9 @@ onMounted(() => {
       <EmptyState
         v-else-if="requiresLogin"
         icon="user-circle"
-        title="Sign in to view profiles."
-        message="Profiles are only available when you're logged in."
-        action-label="Sign in"
+        :title="$t('profile.signInTitle')"
+        :message="$t('profile.signInMessage')"
+        :action-label="$t('auth.signIn')"
         action-icon="sign-in-alt"
         @action="
           router.push({ name: 'Login', query: { redirect: route.fullPath } })
@@ -168,19 +169,19 @@ onMounted(() => {
 
       <ErrorMessage
         v-else-if="error"
-        title="Couldn't load profile"
+        :title="$t('profile.couldntLoad')"
         :message="error"
-        hint="Try again in a moment, or head back."
+        :hint="$t('profile.loadHint')"
       >
         <template #actions>
           <button
-            v-if="error !== 'Player not found'"
+            v-if="error !== $t('profile.playerNotFound')"
             type="button"
             class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
             @click="fetchProfile"
           >
             <font-awesome-icon icon="redo" class="mr-1" />
-            Try again
+            {{ $t("common.retry") }}
           </button>
           <button
             type="button"
@@ -188,7 +189,7 @@ onMounted(() => {
             @click="goBack"
           >
             <font-awesome-icon icon="arrow-left" class="mr-1" />
-            Back
+            {{ $t("common.back") }}
           </button>
         </template>
       </ErrorMessage>
@@ -215,7 +216,7 @@ onMounted(() => {
                   v-if="isOwnProfile"
                   class="rounded-full bg-racket/15 px-3 py-1 text-xs font-semibold text-racket ring-1 ring-racket/30"
                 >
-                  You
+                  {{ $t("common.you") }}
                 </span>
                 <span
                   v-if="player.role"
@@ -236,7 +237,7 @@ onMounted(() => {
               {{ player.elo ?? 1000 }}
             </p>
             <p class="mt-1 text-xs uppercase tracking-wide text-snow-dim">
-              Rating
+              {{ $t("common.rating") }}
             </p>
           </div>
         </div>
@@ -245,12 +246,12 @@ onMounted(() => {
         <div class="grid grid-cols-2 gap-3 pt-5">
           <div class="rounded-xl border border-white/5 bg-white/5 px-4 py-3">
             <p class="text-xs uppercase tracking-wide text-snow-dim">
-              Member ID
+              {{ $t("profile.memberId") }}
             </p>
             <p class="mt-1 text-sm font-medium text-snow">{{ player.id }}</p>
           </div>
           <div class="rounded-xl border border-white/5 bg-white/5 px-4 py-3">
-            <p class="text-xs uppercase tracking-wide text-snow-dim">Joined</p>
+            <p class="text-xs uppercase tracking-wide text-snow-dim">{{ $t("profile.joined") }}</p>
             <p class="mt-1 text-sm font-medium text-snow">{{ memberSince }}</p>
           </div>
         </div>
@@ -268,17 +269,17 @@ onMounted(() => {
           v-if="player.email || player.role"
           class="mt-5 rounded-xl border border-white/5 bg-white/5 p-4"
         >
-          <h3 class="text-sm font-semibold text-snow">Account</h3>
+          <h3 class="text-sm font-semibold text-snow">{{ $t("account.title") }}</h3>
           <div class="mt-4 grid gap-4 sm:grid-cols-2">
             <div v-if="player.email">
               <p class="text-xs uppercase tracking-wide text-asphalt-muted">
-                Email
+                {{ $t("account.email") }}
               </p>
               <p class="mt-2 break-all text-sm text-snow">{{ player.email }}</p>
             </div>
             <div v-if="player.role">
               <p class="text-xs uppercase tracking-wide text-asphalt-muted">
-                Role
+                {{ $t("account.accountType") }}
               </p>
               <p class="mt-2 text-sm capitalize text-snow">{{ player.role }}</p>
             </div>

@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AdminHeader from "./components/AdminHeader.vue";
+import LanguageSwitcher from "./components/LanguageSwitcher.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -17,6 +18,7 @@ router.isReady().then(() => {
 
 <template>
   <div class="min-h-screen bg-court text-snow">
+    <LanguageSwitcher />
     <AdminHeader v-if="showAdminShell" />
 
     <main

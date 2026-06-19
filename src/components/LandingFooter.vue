@@ -10,11 +10,11 @@ import appConfig from "@/config/appConfig";
       <div>
         <p class="text-sm font-semibold text-snow">{{ appConfig.name }}</p>
         <p class="mt-1 text-xs text-asphalt-muted">
-          Court sessions, ELO rankings, one ladder.
+          {{ $t("footer.legacyTagline") }}
         </p>
       </div>
       <router-link to="/login" class="btn-glass text-xs">
-        Admin log in
+        {{ $t("nav.adminLogin") }}
       </router-link>
     </div>
   </footer>

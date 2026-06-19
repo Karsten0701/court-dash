@@ -1,5 +1,6 @@
 <script setup>
 import { formatDate } from "@/utils/formatters.js";
+import { t } from "@/i18n";
 
 const props = defineProps({
   game: { type: Object, required: true },
@@ -10,17 +11,17 @@ const emit = defineEmits(["navigate"]);
 
 const statusConfig = {
   started: {
-    label: "Started",
+    labelKey: "status.started",
     bg: "bg-status-pending/20",
     text: "text-status-pending",
   },
   ended: {
-    label: "Ended",
+    labelKey: "status.ended",
     bg: "bg-status-delivering/20",
     text: "text-status-delivering",
   },
   processed: {
-    label: "Processed",
+    labelKey: "status.processed",
     bg: "bg-status-processed/20",
     text: "text-status-processed",
   },
@@ -42,7 +43,7 @@ const status =
           class="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium"
           :class="[status.bg, status.text]"
         >
-          {{ status.label }}
+          {{ t(status.labelKey) }}
         </span>
       </div>
 
@@ -58,11 +59,11 @@ const status =
       >
         <span class="text-snow-dim">
           <font-awesome-icon icon="calendar-days" class="mr-1" />
-          {{ formatDate(game.startedAt) || "Unknown" }}
+          {{ formatDate(game.startedAt) || $t("common.unknown") }}
         </span>
         <span class="text-snow-dim text-center">
           <template v-if="game.userScore != null">
-            Your score: {{ game.userScore }}
+            {{ $t("games.yourScore", { score: game.userScore }) }}
           </template>
           <template v-else>--</template>
         </span>
@@ -75,7 +76,7 @@ const status =
                   : 'text-danger'
               "
             >
-              {{ game.winnerUserId === currentUserId ? "Win" : "Loss" }}
+              {{ game.winnerUserId === currentUserId ? $t("common.win") : $t("common.loss") }}
             </span>
           </template>
           <template v-else>--</template>

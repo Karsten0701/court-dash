@@ -4,67 +4,72 @@ import PublicSiteHeader from "@/components/PublicSiteHeader.vue";
 </script>
 
 <template>
-  <div class="min-h-screen bg-court px-4 py-6 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-court px-4 py-4 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-7xl">
       <PublicSiteHeader />
 
-      <main class="py-12 lg:py-16">
-        <section class="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+      <main class="py-10 lg:py-14">
+        <section class="grid gap-8 rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card lg:grid-cols-[0.95fr_1.05fr] lg:p-8">
           <div>
-            <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-asphalt-muted">
-              Contact
+            <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-racket">
+              {{ $t("publicPages.contactBadge") }}
             </p>
             <h1 class="text-4xl font-semibold leading-tight text-snow sm:text-5xl">
-              See if the dashboard fits your club night.
+              {{ $t("publicPages.contactTitle") }}
             </h1>
             <p class="mt-5 max-w-2xl text-base leading-7 text-snow-dim">
-              Use this page as the clean SaaS-style contact point. It explains
-              what to prepare before setting up a dashboard for a real group.
+              {{ $t("publicPages.contactSubtitle") }}
             </p>
+            <div class="mt-8 rounded-lg border border-asphalt-light bg-asphalt p-4">
+              <p class="text-sm font-semibold text-snow">{{ $t("publicPages.contactResponse") }}</p>
+              <p class="mt-2 text-sm leading-6 text-snow-dim">{{ $t("publicPages.contactResponseText") }}</p>
+            </div>
           </div>
 
           <div class="rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-xl">
-            <p class="text-sm font-semibold text-snow">Setup checklist</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-ball">{{ $t("publicPages.setupChecklist") }}</p>
+            <h2 class="mt-3 text-2xl font-semibold text-snow">{{ $t("publicPages.contactOpsTitle") }}</h2>
+            <p class="mt-2 text-sm leading-6 text-snow-dim">{{ $t("publicPages.contactOpsText") }}</p>
             <div class="mt-5 grid gap-3">
-              <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
-                <p class="text-sm font-medium text-snow">Player list</p>
-                <p class="mt-1 text-sm text-snow-dim">Names, accounts and who needs admin access.</p>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+                <p class="text-sm font-medium text-snow">{{ $t("publicPages.playerList") }}</p>
+                <p class="mt-1 text-sm text-snow-dim">{{ $t("publicPages.playerListText") }}</p>
               </div>
-              <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
-                <p class="text-sm font-medium text-snow">Game format</p>
-                <p class="mt-1 text-sm text-snow-dim">How sessions are planned, started, scored and processed.</p>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+                <p class="text-sm font-medium text-snow">{{ $t("publicPages.gameFormat") }}</p>
+                <p class="mt-1 text-sm text-snow-dim">{{ $t("publicPages.gameFormatText") }}</p>
               </div>
-              <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
-                <p class="text-sm font-medium text-snow">Court schedule</p>
-                <p class="mt-1 text-sm text-snow-dim">How many courts are active and when players rotate.</p>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+                <p class="text-sm font-medium text-snow">{{ $t("publicPages.courtSchedule") }}</p>
+                <p class="mt-1 text-sm text-snow-dim">{{ $t("publicPages.courtScheduleText") }}</p>
               </div>
             </div>
 
             <router-link
               to="/login"
-              class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-racket px-4 py-2.5 text-sm font-medium text-white hover:bg-racket-hover"
+              class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-racket px-4 py-3 text-sm font-semibold text-white hover:bg-racket-hover"
             >
               <font-awesome-icon icon="sign-in-alt" />
-              Open the login page
+              {{ $t("publicPages.openLogin") }}
             </router-link>
           </div>
         </section>
 
         <section class="mt-12 grid gap-4 md:grid-cols-3">
-          <div class="rounded-lg border border-asphalt-light bg-charcoal p-5">
-            <font-awesome-icon icon="users" class="text-asphalt-muted" />
-            <p class="mt-4 text-sm font-semibold text-snow">Small clubs</p>
-            <p class="mt-2 text-sm leading-6 text-snow-dim">Good for recurring groups that want less manual admin.</p>
+          <div class="rounded-lg border border-asphalt-light bg-asphalt p-5">
+            <font-awesome-icon icon="users" class="text-racket" />
+            <p class="mt-4 text-sm font-semibold text-snow">{{ $t("publicPages.smallClubs") }}</p>
+            <p class="mt-2 text-sm leading-6 text-snow-dim">{{ $t("publicPages.smallClubsText") }}</p>
           </div>
-          <div class="rounded-lg border border-asphalt-light bg-charcoal p-5">
-            <font-awesome-icon icon="calendar-days" class="text-asphalt-muted" />
-            <p class="mt-4 text-sm font-semibold text-snow">Weekly sessions</p>
-            <p class="mt-2 text-sm leading-6 text-snow-dim">Plan, run and close match nights with the same flow.</p>
+          <div class="rounded-lg border border-asphalt-light bg-asphalt p-5">
+            <font-awesome-icon icon="calendar-days" class="text-racket" />
+            <p class="mt-4 text-sm font-semibold text-snow">{{ $t("publicPages.weeklySessions") }}</p>
+            <p class="mt-2 text-sm leading-6 text-snow-dim">{{ $t("publicPages.weeklySessionsText") }}</p>
           </div>
-          <div class="rounded-lg border border-asphalt-light bg-charcoal p-5">
-            <font-awesome-icon icon="chart-line" class="text-asphalt-muted" />
-            <p class="mt-4 text-sm font-semibold text-snow">Ranked play</p>
-            <p class="mt-2 text-sm leading-6 text-snow-dim">Keep standings visible without making the app feel heavy.</p>
+          <div class="rounded-lg border border-asphalt-light bg-asphalt p-5">
+            <font-awesome-icon icon="chart-line" class="text-racket" />
+            <p class="mt-4 text-sm font-semibold text-snow">{{ $t("publicPages.rankedPlay") }}</p>
+            <p class="mt-2 text-sm leading-6 text-snow-dim">{{ $t("publicPages.rankedPlayText") }}</p>
           </div>
         </section>
       </main>

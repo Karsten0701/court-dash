@@ -1,6 +1,8 @@
 <script setup>
 import { useRouter } from "vue-router";
+import { computed } from "vue";
 import { formatDate } from "@/utils/formatters.js";
+import { t } from "@/i18n";
 
 const props = defineProps({
   game: {
@@ -13,32 +15,32 @@ const router = useRouter();
 
 const statusConfig = {
   planned: {
-    label: "Planned",
+    labelKey: "status.planned",
     bg: "bg-racket/15",
     text: "text-racket",
     ring: "ring-racket/30",
   },
   started: {
-    label: "Live",
+    labelKey: "status.live",
     bg: "bg-status-pending/15",
     text: "text-status-pending",
     ring: "ring-status-pending/30",
   },
   ended: {
-    label: "Ended",
+    labelKey: "status.ended",
     bg: "bg-status-delivering/15",
     text: "text-status-delivering",
     ring: "ring-status-delivering/30",
   },
   processed: {
-    label: "Processed",
+    labelKey: "status.processed",
     bg: "bg-status-processed/15",
     text: "text-status-processed",
     ring: "ring-status-processed/30",
   },
 };
 
-const status = statusConfig[props.game.status] || statusConfig.planned;
+const status = computed(() => statusConfig[props.game.status] || statusConfig.planned);
 
 const viewDetails = () => {
   router.push(`/details/${props.game.id}`);
@@ -61,7 +63,7 @@ const viewDetails = () => {
           class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset"
           :class="[status.bg, status.text, status.ring]"
         >
-          {{ status.label }}
+          {{ t(status.labelKey) }}
         </span>
       </div>
 
@@ -72,7 +74,7 @@ const viewDetails = () => {
       <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-4 text-sm">
         <div class="min-w-0">
           <p class="text-[11px] uppercase tracking-wide text-asphalt-muted">
-            Date
+            {{ $t("games.date") }}
           </p>
           <p class="mt-0.5 truncate font-medium text-snow">
             <font-awesome-icon icon="calendar-days" class="mr-1 text-racket" />
@@ -81,7 +83,7 @@ const viewDetails = () => {
         </div>
         <div class="min-w-0 text-center">
           <p class="text-[11px] uppercase tracking-wide text-asphalt-muted">
-            Players
+            {{ $t("games.players") }}
           </p>
           <p class="mt-0.5 font-semibold text-snow">
             {{ game.signupCount ?? 0 }}
@@ -89,7 +91,7 @@ const viewDetails = () => {
         </div>
         <div class="min-w-0 text-right">
           <p class="text-[11px] uppercase tracking-wide text-asphalt-muted">
-            Avg ELO
+            {{ $t("games.avgElo") }}
           </p>
           <p class="mt-0.5 font-semibold text-snow">
             <template v-if="game.averageElo != null">

@@ -4,6 +4,7 @@ import apiService from "@/services/apiService.js";
 import GameCard from "@/components/GameCard.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import EmptyState from "@/components/EmptyState.vue";
+import { t } from "@/i18n";
 
 const games = ref([]);
 const isLoading = ref(true);
@@ -27,9 +28,9 @@ const fetchGames = async () => {
   } catch (err) {
     console.error("Failed to fetch games:", err);
     if (err.status === 500) {
-      error.value = "Something went wrong. Please try again later.";
+      error.value = t("errors.generic");
     } else {
-      error.value = err.message || "Failed to load games";
+      error.value = err.message || t("home.failedLoad");
     }
   } finally {
     isLoading.value = false;
@@ -50,15 +51,15 @@ onMounted(() => {
           class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-snow-dim"
         >
           <span class="h-1.5 w-1.5 rounded-full bg-turf"></span>
-          Live ranking ladder
+          {{ $t("home.liveLadder") }}
         </span>
         <h1
           class="mt-4 bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-4xl font-extrabold tracking-tight text-transparent"
         >
-          King of the Court
+          {{ $t("home.title") }}
         </h1>
         <p class="text-snow-dim text-sm mt-2">
-          Upcoming games - claim your spot.
+          {{ $t("home.subtitle") }}
         </p>
       </div>
 
@@ -81,10 +82,10 @@ onMounted(() => {
       <!-- Error State -->
       <ErrorMessage
         v-else-if="error"
-        title="Error loading games"
+        :title="$t('home.errorTitle')"
         :message="error"
-        hint="Something went wrong loading the games. Check your connection and try again."
-        retry-label="Try again"
+        :hint="$t('home.errorHint')"
+        :retry-label="$t('common.retry')"
         @retry="fetchGames"
         class="max-w-2xl mx-auto"
       />
@@ -93,9 +94,9 @@ onMounted(() => {
       <EmptyState
         v-else-if="games.length === 0"
         icon="home"
-        title="No games available right now."
-        message="Check back later for upcoming games!"
-        action-label="Refresh"
+        :title="$t('home.emptyTitle')"
+        :message="$t('home.emptyMessage')"
+        :action-label="$t('common.refresh')"
         action-icon="redo"
         @action="fetchGames"
       />

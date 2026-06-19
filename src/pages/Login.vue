@@ -7,6 +7,7 @@ import FormInput from "@/components/FormInput.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import PublicSiteFooter from "@/components/PublicSiteFooter.vue";
 import PublicSiteHeader from "@/components/PublicSiteHeader.vue";
+import { t } from "@/i18n";
 
 const router = useRouter();
 const email = ref("");
@@ -16,7 +17,7 @@ const isLoading = ref(false);
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
-    error.value = "Please enter both email and password";
+    error.value = t("auth.requiredFields");
     return;
   }
 
@@ -28,7 +29,7 @@ const handleLogin = async () => {
 
     if (!authService.isAdmin()) {
       await authService.logout().catch(() => {});
-      error.value = "This dashboard is only available to admin accounts.";
+      error.value = t("auth.adminRequired");
       return;
     }
 
@@ -36,21 +37,21 @@ const handleLogin = async () => {
     router.push(redirectTo);
   } catch (err) {
     if (err.message.includes("429") || err.message.includes("rate limit")) {
-      error.value = "Rate limited. Please try again later.";
+      error.value = t("auth.rateLimited");
     } else if (
       err.message.includes("401") ||
       err.message.includes("Invalid credentials")
     ) {
-      error.value = "Invalid email or password. Please try again.";
+      error.value = t("auth.invalidCredentials");
     } else if (err.message.includes("500")) {
-      error.value = "Something went wrong. Please try again later.";
+      error.value = t("errors.generic");
     } else if (
       err.message.includes("Failed to fetch") ||
       err.message.includes("NetworkError")
     ) {
-      error.value = err.message || "Login failed. Please try again.";
+      error.value = err.message || t("auth.loginFailed");
     } else {
-      error.value = err.message || "Login failed. Please try again.";
+      error.value = err.message || t("auth.loginFailed");
     }
     console.error("Login error:", err);
   } finally {
@@ -68,13 +69,13 @@ const handleLogin = async () => {
         <section class="grid items-center gap-8 lg:grid-cols-[1.08fr_0.92fr]">
           <div class="max-w-3xl">
             <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-asphalt-muted">
-              For padel and tennis organizers
+              {{ $t("landing.eyebrow") }}
             </p>
             <h1 class="text-4xl font-semibold leading-tight text-snow sm:text-5xl lg:text-6xl">
-              Run your court nights without the spreadsheet mess.
+              {{ $t("landing.title") }}
             </h1>
             <p class="mt-5 max-w-2xl text-base leading-7 text-snow-dim sm:text-lg">
-              Plan sessions, manage players, follow rankings and keep the admin work in one clean dashboard.
+              {{ $t("landing.subtitle") }}
             </p>
 
             <div class="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -83,29 +84,29 @@ const handleLogin = async () => {
                 class="inline-flex items-center justify-center gap-2 rounded-md bg-racket px-4 py-2.5 text-sm font-medium text-white hover:bg-racket-hover"
               >
                 <font-awesome-icon icon="sign-in-alt" />
-                Open dashboard
+                {{ $t("landing.openDashboard") }}
               </a>
               <a
                 href="#features"
                 class="inline-flex items-center justify-center gap-2 rounded-md border border-asphalt-light px-4 py-2.5 text-sm font-medium text-snow hover:bg-asphalt"
               >
                 <font-awesome-icon icon="chevron-down" />
-                See what's inside
+                {{ $t("landing.viewFeatures") }}
               </a>
             </div>
 
             <dl class="mt-10 grid max-w-2xl grid-cols-3 gap-3">
               <div class="rounded-lg border border-asphalt-light bg-charcoal p-4">
-                <dt class="text-xs text-asphalt-muted">Setup</dt>
-                <dd class="mt-2 text-2xl font-semibold text-snow">Fast</dd>
+                <dt class="text-xs text-asphalt-muted">{{ $t("landing.highlights.setup") }}</dt>
+                <dd class="mt-2 text-2xl font-semibold text-snow">{{ $t("landing.highlights.setupValue") }}</dd>
               </div>
               <div class="rounded-lg border border-asphalt-light bg-charcoal p-4">
-                <dt class="text-xs text-asphalt-muted">Views</dt>
-                <dd class="mt-2 text-2xl font-semibold text-snow">Live</dd>
+                <dt class="text-xs text-asphalt-muted">{{ $t("landing.highlights.views") }}</dt>
+                <dd class="mt-2 text-2xl font-semibold text-snow">{{ $t("landing.highlights.viewsValue") }}</dd>
               </div>
               <div class="rounded-lg border border-asphalt-light bg-charcoal p-4">
-                <dt class="text-xs text-asphalt-muted">Admin</dt>
-                <dd class="mt-2 text-2xl font-semibold text-snow">Clear</dd>
+                <dt class="text-xs text-asphalt-muted">{{ $t("landing.highlights.admin") }}</dt>
+                <dd class="mt-2 text-2xl font-semibold text-snow">{{ $t("landing.highlights.adminValue") }}</dd>
               </div>
             </dl>
           </div>
@@ -114,26 +115,26 @@ const handleLogin = async () => {
             <div class="rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-xl">
               <div class="mb-5 flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-snow">Tonight's court</p>
-                  <p class="text-xs text-asphalt-muted">Planning overview</p>
+                  <p class="text-sm font-medium text-snow">{{ $t("landing.courtTitle") }}</p>
+                  <p class="text-xs text-asphalt-muted">{{ $t("landing.courtSubtitle") }}</p>
                 </div>
                 <span class="inline-flex items-center gap-2 rounded-full bg-turf/20 px-3 py-1 text-xs font-medium text-turf">
                   <span class="h-2 w-2 rounded-full bg-turf" />
-                  Ready
+                  {{ $t("status.ready") }}
                 </span>
               </div>
 
               <div class="grid gap-3 sm:grid-cols-3">
                 <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
-                  <p class="text-xs text-asphalt-muted">Players</p>
+                  <p class="text-xs text-asphalt-muted">{{ $t("landing.players") }}</p>
                   <p class="mt-2 text-3xl font-semibold tabular-nums text-snow">24</p>
                 </div>
                 <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
-                  <p class="text-xs text-asphalt-muted">Games</p>
+                  <p class="text-xs text-asphalt-muted">{{ $t("landing.games") }}</p>
                   <p class="mt-2 text-3xl font-semibold tabular-nums text-snow">8</p>
                 </div>
                 <div class="rounded-lg border border-asphalt-light bg-asphalt/40 p-4">
-                  <p class="text-xs text-asphalt-muted">Courts</p>
+                  <p class="text-xs text-asphalt-muted">{{ $t("landing.courts") }}</p>
                   <p class="mt-2 text-3xl font-semibold tabular-nums text-snow">4</p>
                 </div>
               </div>
@@ -145,8 +146,8 @@ const handleLogin = async () => {
                       <font-awesome-icon icon="calendar-days" />
                     </span>
                     <div>
-                      <p class="text-sm font-medium text-snow">King round 1</p>
-                      <p class="text-xs text-asphalt-muted">Court 2 - 19:30</p>
+                      <p class="text-sm font-medium text-snow">{{ $t("landing.roundOne") }}</p>
+                      <p class="text-xs text-asphalt-muted">{{ $t("landing.courtTime") }}</p>
                     </div>
                   </div>
                   <font-awesome-icon icon="chevron-right" class="text-asphalt-muted" />
@@ -157,8 +158,8 @@ const handleLogin = async () => {
                       <font-awesome-icon icon="trophy" />
                     </span>
                     <div>
-                      <p class="text-sm font-medium text-snow">Ranking update</p>
-                      <p class="text-xs text-asphalt-muted">Scores processed after the final match</p>
+                      <p class="text-sm font-medium text-snow">{{ $t("landing.rankingUpdate") }}</p>
+                      <p class="text-xs text-asphalt-muted">{{ $t("landing.scoresProcessed") }}</p>
                     </div>
                   </div>
                   <font-awesome-icon icon="chevron-right" class="text-asphalt-muted" />
@@ -172,9 +173,9 @@ const handleLogin = async () => {
               @submit.prevent="handleLogin"
             >
               <div>
-                <p class="text-sm font-semibold text-snow">Admin login</p>
+                <p class="text-sm font-semibold text-snow">{{ $t("auth.loginTitle") }}</p>
                 <p class="mt-1 text-sm text-snow-dim">
-                  Sign in to manage players, games and API status.
+                  {{ $t("auth.loginSubtitle") }}
                 </p>
               </div>
 
@@ -182,26 +183,26 @@ const handleLogin = async () => {
                 <FormInput
                   id="email"
                   v-model="email"
-                  label="Email"
+                  :label="$t('auth.email')"
                   type="email"
                   :required="true"
                   :disabled="isLoading"
-                  placeholder="Email address"
+                  :placeholder="$t('auth.emailPlaceholder')"
                 />
                 <FormInput
                   id="password"
                   v-model="password"
-                  label="Password"
+                  :label="$t('auth.password')"
                   type="password"
                   :required="true"
                   :disabled="isLoading"
-                  placeholder="Password"
+                  :placeholder="$t('auth.passwordPlaceholder')"
                 />
               </div>
 
               <ErrorMessage
                 v-if="error"
-                title="Login failed"
+                :title="$t('auth.loginFailed')"
                 :message="error"
                 :hint="error"
               />
@@ -213,7 +214,7 @@ const handleLogin = async () => {
               >
                 <LoadingSpinner v-if="isLoading" class="text-white" />
                 <font-awesome-icon v-else icon="sign-in-alt" />
-                <span>{{ isLoading ? "Signing in..." : "Sign in" }}</span>
+                <span>{{ isLoading ? $t("auth.signingIn") : $t("auth.signIn") }}</span>
               </button>
             </form>
           </div>
@@ -222,23 +223,23 @@ const handleLogin = async () => {
         <section id="features" class="grid gap-4 lg:grid-cols-3">
           <article class="rounded-lg border border-asphalt-light bg-charcoal p-5">
             <font-awesome-icon icon="users" class="text-asphalt-muted" />
-            <h2 class="mt-4 text-base font-semibold text-snow">Player records</h2>
+            <h2 class="mt-4 text-base font-semibold text-snow">{{ $t("landing.featurePlayerTitle") }}</h2>
             <p class="mt-2 text-sm leading-6 text-snow-dim">
-              Keep player data, roles and ranking visibility tidy from one admin view.
+              {{ $t("landing.featurePlayerText") }}
             </p>
           </article>
           <article class="rounded-lg border border-asphalt-light bg-charcoal p-5">
             <font-awesome-icon icon="table-tennis-paddle-ball" class="text-asphalt-muted" />
-            <h2 class="mt-4 text-base font-semibold text-snow">Game control</h2>
+            <h2 class="mt-4 text-base font-semibold text-snow">{{ $t("landing.featureGameTitle") }}</h2>
             <p class="mt-2 text-sm leading-6 text-snow-dim">
-              Create sessions, add participants and move games from planning to results.
+              {{ $t("landing.featureGameText") }}
             </p>
           </article>
           <article class="rounded-lg border border-asphalt-light bg-charcoal p-5">
             <font-awesome-icon icon="server" class="text-asphalt-muted" />
-            <h2 class="mt-4 text-base font-semibold text-snow">System checks</h2>
+            <h2 class="mt-4 text-base font-semibold text-snow">{{ $t("landing.featureSystemTitle") }}</h2>
             <p class="mt-2 text-sm leading-6 text-snow-dim">
-              See whether the API and database are healthy before match night starts.
+              {{ $t("landing.featureSystemText") }}
             </p>
           </article>
         </section>

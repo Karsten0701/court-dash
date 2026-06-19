@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { t } from "@/i18n";
 
 const emit = defineEmits(['player-click'])
 
@@ -7,9 +8,9 @@ const props = defineProps({
   participants: { type: Array, required: true },
   winnerUserId: { type: Number, default: null },
   valueField: { type: String, default: 'score' },
-  valueLabel: { type: String, default: 'pts' },
-  title: { type: String, default: 'Players' },
-  emptyText: { type: String, default: 'No players yet.' },
+  valueLabel: { type: String, default: null },
+  title: { type: String, default: null },
+  emptyText: { type: String, default: null },
   showRank: { type: Boolean, default: true },
   clickable: { type: Boolean, default: false },
 })
@@ -30,7 +31,7 @@ const sortedParticipants = computed(() => {
 <template>
   <div>
     <p v-if="!sortedParticipants.length" class="text-sm text-asphalt-muted text-center py-4">
-      {{ emptyText }}
+      {{ emptyText || $t("players.noPlayers") }}
     </p>
 
     <div v-else class="divide-y divide-asphalt-light">
@@ -76,7 +77,7 @@ const sortedParticipants = computed(() => {
         <span class="text-sm text-snow-dim shrink-0">
           <font-awesome-icon v-if="valueField === 'elo'" icon="chart-line" class="mr-1" />
           <font-awesome-icon v-else-if="valueField === 'score'" icon="star" class="mr-1" />
-          {{ participant[valueField] ?? '--' }} {{ valueLabel }}
+          {{ participant[valueField] ?? '--' }} {{ valueLabel || t("common.points") }}
         </span>
       </component>
     </div>
