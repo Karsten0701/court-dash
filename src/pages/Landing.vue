@@ -63,22 +63,22 @@ const workflow = computed(() => [
             aria-hidden="true"
           ></div>
           <div
-            class="absolute inset-0 bg-white/30"
+            class="absolute inset-0 bg-charcoal/30"
             aria-hidden="true"
           ></div>
-          <div class="relative z-10 mx-auto grid max-w-7xl gap-10 rounded-lg border border-[#d7e1da] bg-white p-5 shadow-card sm:p-8 lg:grid-cols-[0.95fr_0.75fr] lg:items-center lg:p-10">
+          <div class="relative z-10 mx-auto grid max-w-7xl gap-10 rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card sm:p-8 lg:grid-cols-[0.95fr_0.75fr] lg:items-center lg:p-10">
           <div class="max-w-3xl">
-            <span class="inline-flex items-center gap-2 rounded-full border border-[#d7e1da] bg-[#f4f8f5] px-3 py-1 text-xs font-semibold uppercase text-[#127b5c]">
+            <span class="inline-flex items-center gap-2 rounded-md border border-asphalt-light bg-asphalt px-3 py-1 text-xs font-semibold uppercase text-racket">
               <span class="h-1.5 w-1.5 rounded-full bg-ball"></span>
               {{ $t("landing.heroBadge") }}
             </span>
-            <h1 class="mt-5 max-w-4xl text-4xl font-semibold leading-tight text-[#071812] sm:text-6xl lg:text-7xl">
+            <h1 class="mt-5 max-w-4xl text-4xl font-semibold leading-tight text-snow sm:text-6xl lg:text-7xl">
               {{ $t("landing.title") }}
             </h1>
-            <p class="mt-5 max-w-2xl text-base leading-7 text-[#53675d] sm:text-lg">
+            <p class="mt-5 max-w-2xl text-base leading-7 text-snow-dim sm:text-lg">
               {{ $t("landing.subtitle") }}
             </p>
-            <p class="mt-3 max-w-2xl text-sm leading-6 text-[#6f8278]">
+            <p class="mt-3 max-w-2xl text-sm leading-6 text-asphalt-muted">
               {{ $t("landing.heroProof") }}
             </p>
 
@@ -92,79 +92,79 @@ const workflow = computed(() => [
               </router-link>
               <router-link
                 to="/features"
-                class="inline-flex items-center justify-center gap-2 rounded-md border border-[#d7e1da] bg-white px-5 py-3 text-sm font-semibold text-[#071812] hover:bg-[#f4f8f5]"
+                class="inline-flex items-center justify-center gap-2 rounded-md border border-asphalt-light bg-charcoal px-5 py-3 text-sm font-semibold text-snow hover:bg-asphalt"
               >
                 <font-awesome-icon icon="chevron-right" />
                 {{ $t("landing.viewFeatures") }}
               </router-link>
             </div>
 
-            <p class="mt-10 text-xs font-semibold uppercase tracking-[0.22em] text-[#6f8278]">
+            <p class="mt-10 text-xs font-semibold uppercase tracking-[0.22em] text-asphalt-muted">
               {{ $t("landing.clubProof") }}
             </p>
             <dl class="mt-4 grid max-w-2xl grid-cols-3 gap-3">
               <div
                 v-for="item in highlights"
                 :key="item.label"
-                class="rounded-lg border border-[#d7e1da] bg-white p-4"
+                class="rounded-lg border border-asphalt-light bg-charcoal p-4"
               >
-                <dt class="text-xs text-[#6f8278]">{{ item.label }}</dt>
-                <dd class="mt-2 text-2xl font-semibold text-[#127b5c]">{{ item.value }}</dd>
+                <dt class="text-xs text-asphalt-muted">{{ item.label }}</dt>
+                <dd class="mt-2 text-2xl font-semibold text-racket">{{ item.value }}</dd>
               </div>
             </dl>
           </div>
 
-          <div class="rounded-lg border border-[#d7e1da] bg-white p-5 shadow-card">
+          <div class="rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card">
             <div class="mb-5 flex items-center justify-between">
               <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#127b5c]">{{ $t("landing.liveBoard") }}</p>
-                <p class="mt-1 text-lg font-semibold text-[#071812]">{{ $t("landing.courtTitle") }}</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-racket">{{ $t("landing.liveBoard") }}</p>
+                <p class="mt-1 text-lg font-semibold text-snow">{{ $t("landing.courtTitle") }}</p>
               </div>
-              <span class="inline-flex items-center gap-2 rounded-full bg-[#e8f4ee] px-3 py-1 text-xs font-medium text-[#127b5c]">
+              <span class="inline-flex items-center gap-2 rounded-md bg-asphalt px-3 py-1 text-xs font-medium text-racket">
                 <span class="h-2 w-2 rounded-full bg-turf" />
                 {{ $t("status.ready") }}
               </span>
             </div>
 
             <div class="grid gap-3 sm:grid-cols-3">
-              <div class="rounded-lg border border-[#d7e1da] bg-[#f4f8f5] p-4">
-                <p class="text-xs text-[#6f8278]">{{ $t("landing.players") }}</p>
-                <p class="mt-2 text-3xl font-semibold tabular-nums text-[#071812]">24</p>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+                <p class="text-xs text-asphalt-muted">{{ $t("landing.players") }}</p>
+                <p class="mt-2 text-3xl font-semibold tabular-nums text-snow">24</p>
               </div>
-              <div class="rounded-lg border border-[#d7e1da] bg-[#f4f8f5] p-4">
-                <p class="text-xs text-[#6f8278]">{{ $t("landing.games") }}</p>
-                <p class="mt-2 text-3xl font-semibold tabular-nums text-[#071812]">8</p>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+                <p class="text-xs text-asphalt-muted">{{ $t("landing.games") }}</p>
+                <p class="mt-2 text-3xl font-semibold tabular-nums text-snow">8</p>
               </div>
-              <div class="rounded-lg border border-[#d7e1da] bg-[#f4f8f5] p-4">
-                <p class="text-xs text-[#6f8278]">{{ $t("landing.capacity") }}</p>
-                <p class="mt-2 text-3xl font-semibold tabular-nums text-[#071812]">91%</p>
+              <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
+                <p class="text-xs text-asphalt-muted">{{ $t("landing.capacity") }}</p>
+                <p class="mt-2 text-3xl font-semibold tabular-nums text-snow">91%</p>
               </div>
             </div>
 
             <div class="mt-4 space-y-3">
-              <div class="flex items-center justify-between rounded-lg border border-[#d7e1da] bg-[#f4f8f5] p-3">
+              <div class="flex items-center justify-between rounded-lg border border-asphalt-light bg-asphalt p-3">
                 <div class="flex items-center gap-3">
                   <span class="flex h-8 w-8 items-center justify-center rounded-md bg-racket text-xs text-white">
                     <font-awesome-icon icon="calendar-days" />
                   </span>
                   <div>
-                    <p class="text-sm font-medium text-[#071812]">{{ $t("landing.roundOne") }}</p>
-                    <p class="text-xs text-[#6f8278]">{{ $t("landing.courtTime") }}</p>
+                    <p class="text-sm font-medium text-snow">{{ $t("landing.roundOne") }}</p>
+                    <p class="text-xs text-asphalt-muted">{{ $t("landing.courtTime") }}</p>
                   </div>
                 </div>
-                <font-awesome-icon icon="chevron-right" class="text-[#6f8278]" />
+                <font-awesome-icon icon="chevron-right" class="text-asphalt-muted" />
               </div>
-              <div class="flex items-center justify-between rounded-lg border border-[#d7e1da] bg-[#f4f8f5] p-3">
+              <div class="flex items-center justify-between rounded-lg border border-asphalt-light bg-asphalt p-3">
                 <div class="flex items-center gap-3">
-                  <span class="flex h-8 w-8 items-center justify-center rounded-md bg-ball text-xs text-[#071812]">
+                  <span class="flex h-8 w-8 items-center justify-center rounded-md bg-ball text-xs text-snow">
                     <font-awesome-icon icon="trophy" />
                   </span>
                   <div>
-                    <p class="text-sm font-medium text-[#071812]">{{ $t("landing.rankingUpdate") }}</p>
-                    <p class="text-xs text-[#6f8278]">{{ $t("landing.scoresProcessed") }}</p>
+                    <p class="text-sm font-medium text-snow">{{ $t("landing.rankingUpdate") }}</p>
+                    <p class="text-xs text-asphalt-muted">{{ $t("landing.scoresProcessed") }}</p>
                   </div>
                 </div>
-                <font-awesome-icon icon="chevron-right" class="text-[#6f8278]" />
+                <font-awesome-icon icon="chevron-right" class="text-asphalt-muted" />
               </div>
             </div>
           </div>

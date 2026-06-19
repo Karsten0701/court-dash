@@ -78,7 +78,7 @@ const submitCheckout = () => {
       <PublicSiteHeader />
 
       <main class="py-10 lg:py-14">
-        <section class="grid gap-8 rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card lg:grid-cols-[1fr_0.7fr] lg:items-end lg:p-8">
+        <section class="grid gap-8 rounded-lg border border-asphalt-light bg-charcoal p-6 shadow-card lg:grid-cols-[1fr_0.7fr] lg:items-end lg:p-10">
           <div class="max-w-3xl">
             <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-racket">
               {{ $t("publicPages.pricingBadge") }}
@@ -99,7 +99,7 @@ const submitCheckout = () => {
           <article
             v-for="plan in plans"
             :key="plan.name"
-            class="rounded-lg border p-5 transition hover:-translate-y-1"
+            class="rounded-lg border p-5"
             :class="plan.highlighted ? 'border-racket bg-charcoal shadow-card' : 'border-asphalt-light bg-charcoal shadow-card'"
           >
             <div class="flex items-start justify-between gap-4">
@@ -109,7 +109,7 @@ const submitCheckout = () => {
               </div>
               <span
                 v-if="plan.highlighted"
-                class="rounded-full bg-ball px-3 py-1 text-xs font-semibold text-white"
+                class="rounded-md bg-racket px-3 py-1 text-xs font-semibold text-white"
               >
                 {{ $t("publicPages.popular") }}
               </span>
@@ -123,7 +123,7 @@ const submitCheckout = () => {
                 :key="item"
                 class="flex items-center gap-3 text-sm text-snow-dim"
               >
-                <font-awesome-icon icon="check" class="text-ball" />
+                <font-awesome-icon icon="check" class="text-racket" />
                 {{ item }}
               </li>
             </ul>
@@ -146,7 +146,7 @@ const submitCheckout = () => {
 
     <div
       v-if="selectedPlan"
-      class="fixed inset-0 z-[100] flex items-center justify-center bg-court px-4 py-6 "
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-court px-4 py-6"
       @click.self="closeCheckout"
     >
       <section class="w-full max-w-lg rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card">

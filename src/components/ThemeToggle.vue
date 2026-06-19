@@ -19,8 +19,7 @@ const toggleTheme = () => {
 
 onMounted(() => {
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-  applyTheme(stored || (prefersDark ? "dark" : "light"));
+  applyTheme(stored || "light");
 });
 </script>
 

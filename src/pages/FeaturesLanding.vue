@@ -34,7 +34,7 @@ const featureGroups = computed(() => [
       <PublicSiteHeader />
 
       <main class="py-10 lg:py-14">
-        <section class="rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card lg:p-8">
+        <section class="rounded-lg border border-asphalt-light bg-charcoal p-6 shadow-card lg:p-10">
           <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
           <div>
             <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-racket">
@@ -50,15 +50,15 @@ const featureGroups = computed(() => [
           </div>
           <div class="mt-8 grid gap-3 sm:grid-cols-3">
             <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
-              <p class="text-3xl font-semibold text-ball">5</p>
+              <p class="text-3xl font-semibold text-racket">5</p>
               <p class="mt-1 text-xs text-snow-dim">{{ $t("publicPages.featuresMetricOne") }}</p>
             </div>
             <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
-              <p class="text-3xl font-semibold text-ball">3</p>
+              <p class="text-3xl font-semibold text-racket">3</p>
               <p class="mt-1 text-xs text-snow-dim">{{ $t("publicPages.featuresMetricTwo") }}</p>
             </div>
             <div class="rounded-lg border border-asphalt-light bg-asphalt p-4">
-              <p class="text-3xl font-semibold text-ball">24/7</p>
+              <p class="text-3xl font-semibold text-racket">24/7</p>
               <p class="mt-1 text-xs text-snow-dim">{{ $t("publicPages.featuresMetricThree") }}</p>
             </div>
           </div>
@@ -68,7 +68,7 @@ const featureGroups = computed(() => [
           <article
             v-for="feature in featureGroups"
             :key="feature.title"
-            class="rounded-lg border border-asphalt-light bg-asphalt p-5"
+            class="rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card"
           >
             <div class="flex h-10 w-10 items-center justify-center rounded-md bg-asphalt text-racket">
               <font-awesome-icon :icon="feature.icon" />
@@ -78,7 +78,7 @@ const featureGroups = computed(() => [
           </article>
         </section>
 
-        <section class="mt-12 rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card lg:p-8">
+        <section class="mt-12 rounded-lg border border-asphalt-light bg-charcoal p-6 shadow-card lg:p-10">
           <div class="grid gap-8 lg:grid-cols-3">
             <div class="lg:col-span-1">
               <p class="text-xs font-semibold uppercase tracking-[0.22em] text-racket">{{ $t("publicPages.adminWorkflow") }}</p>

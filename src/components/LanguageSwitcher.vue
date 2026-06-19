@@ -3,6 +3,10 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { currentLocale, setLocale } from "@/i18n";
 
+defineProps({
+  fixed: { type: Boolean, default: true },
+});
+
 const route = useRoute();
 const isOpen = ref(false);
 const switcher = ref(null);
@@ -47,11 +51,11 @@ onBeforeUnmount(() => {
   <div
     v-if="showSwitcher"
     ref="switcher"
-    class="fixed right-4 top-4 z-[90]"
+    :class="fixed ? 'fixed right-4 top-4 z-[90]' : 'relative z-[90]'"
   >
     <button
       type="button"
-      class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-charcoal/85 text-snow shadow-card backdrop-blur-xl transition-colors hover:bg-asphalt"
+      class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-asphalt-light bg-charcoal text-snow transition-colors hover:bg-asphalt"
       :aria-label="$t('language.switcherLabel')"
       :aria-expanded="isOpen"
       aria-haspopup="menu"
@@ -62,14 +66,14 @@ onBeforeUnmount(() => {
 
     <div
       v-if="isOpen"
-      class="absolute right-0 mt-2 w-44 overflow-hidden rounded-lg border border-white/10 bg-charcoal/95 p-1 shadow-card backdrop-blur-xl"
+      class="absolute right-0 mt-2 w-44 overflow-hidden rounded-lg border border-asphalt-light bg-charcoal p-1 shadow-card"
       role="menu"
     >
       <button
         v-for="language in languages"
         :key="language.code"
         type="button"
-        class="flex w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-left text-sm text-snow-dim hover:bg-white/5 hover:text-snow"
+        class="flex w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-left text-sm text-snow-dim hover:bg-asphalt hover:text-snow"
         :aria-current="activeLocale === language.code ? 'true' : undefined"
         role="menuitem"
         @click="chooseLocale(language.code)"

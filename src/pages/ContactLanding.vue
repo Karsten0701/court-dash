@@ -9,7 +9,7 @@ import PublicSiteHeader from "@/components/PublicSiteHeader.vue";
       <PublicSiteHeader />
 
       <main class="py-10 lg:py-14">
-        <section class="grid gap-8 rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-card lg:grid-cols-[0.95fr_1.05fr] lg:p-8">
+        <section class="grid gap-8 rounded-lg border border-asphalt-light bg-charcoal p-6 shadow-card lg:grid-cols-[0.95fr_1.05fr] lg:p-10">
           <div>
             <p class="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-racket">
               {{ $t("publicPages.contactBadge") }}
@@ -26,8 +26,8 @@ import PublicSiteHeader from "@/components/PublicSiteHeader.vue";
             </div>
           </div>
 
-          <div class="rounded-lg border border-asphalt-light bg-charcoal p-5 shadow-xl">
-            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-ball">{{ $t("publicPages.setupChecklist") }}</p>
+          <div class="rounded-lg border border-asphalt-light bg-asphalt p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-racket">{{ $t("publicPages.setupChecklist") }}</p>
             <h2 class="mt-3 text-2xl font-semibold text-snow">{{ $t("publicPages.contactOpsTitle") }}</h2>
             <p class="mt-2 text-sm leading-6 text-snow-dim">{{ $t("publicPages.contactOpsText") }}</p>
             <div class="mt-5 grid gap-3">

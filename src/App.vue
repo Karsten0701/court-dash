@@ -18,7 +18,7 @@ router.isReady().then(() => {
 
 <template>
   <div class="min-h-screen bg-court text-snow">
-    <LanguageSwitcher />
+    <LanguageSwitcher v-if="showAdminShell" />
     <AdminHeader v-if="showAdminShell" />
 
     <main

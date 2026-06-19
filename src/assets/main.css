@@ -32,7 +32,7 @@
 }
 
 html {
-  background-color: var(--court);
+  background-color: rgb(var(--court));
 }
 
 body {
@@ -61,8 +61,8 @@ body {
 }
 
 ::selection {
-  background: var(--racket);
-  color: var(--snow);
+  background: rgb(var(--racket));
+  color: rgb(var(--charcoal));
 }
 
 ::-webkit-scrollbar {
@@ -74,12 +74,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--asphalt-light);
+  background: rgb(var(--asphalt-light));
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--asphalt-muted);
+  background: rgb(var(--asphalt-muted));
 }
 
 /* Prevent browser autofill from overriding dark theme input styles */
@@ -87,9 +87,9 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px var(--asphalt) inset !important;
-  -webkit-text-fill-color: var(--snow) !important;
-  caret-color: var(--snow);
+  -webkit-box-shadow: 0 0 0 30px rgb(var(--asphalt)) inset !important;
+  -webkit-text-fill-color: rgb(var(--snow)) !important;
+  caret-color: rgb(var(--snow));
   transition: background-color 5000s ease-in-out 0s;
 }
 
