@@ -17,18 +17,18 @@
 }
 
 :root.theme-dark {
-  --court: 6 19 15;
-  --asphalt: 17 44 36;
-  --asphalt-light: 27 66 55;
-  --asphalt-muted: 125 161 149;
-  --charcoal: 11 29 24;
-  --racket: 30 196 144;
-  --racket-hover: 21 168 123;
-  --turf: 52 211 153;
-  --turf-hover: 16 185 129;
-  --ball: 214 255 79;
-  --snow: 245 255 249;
-  --snow-dim: 189 213 202;
+  --court: 11 13 15;
+  --asphalt: 25 30 32;
+  --asphalt-light: 47 56 55;
+  --asphalt-muted: 142 156 150;
+  --charcoal: 17 21 23;
+  --racket: 42 196 140;
+  --racket-hover: 30 170 121;
+  --turf: 53 211 153;
+  --turf-hover: 34 197 130;
+  --ball: 204 235 84;
+  --snow: 242 248 245;
+  --snow-dim: 192 205 199;
 }
 
 html {

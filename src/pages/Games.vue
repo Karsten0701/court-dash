@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import gamesService from "@/services/gamesService.js";
 import playersService from "@/services/playersService.js";
 import apiService from "@/services/apiService.js";
+import orgService from "@/services/orgService.js";
 import { useApiRequest } from "@/composables/useApiRequest.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
@@ -21,6 +22,7 @@ let processCloseTimer = null;
 const historyGames = ref([]);
 const historyLoading = ref(false);
 const historyError = ref("");
+const isReadOnly = computed(() => orgService.isInactive.value);
 
 const {
   data: games,
@@ -135,11 +137,21 @@ const toggleExpand = async (game) => {
 };
 
 const openCreateModal = () => {
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   createForm.value = { name: "", description: "", plannedAt: "" };
   showCreateModal.value = true;
 };
 
 const submitCreate = async () => {
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   try {
     const plannedAt = toIsoDateTime(createForm.value.plannedAt);
     const payload = {
@@ -211,6 +223,10 @@ const performPlayerSearch = async (game) => {
 
 const addPlayerToGame = async (game, player) => {
   if (isPlayerInGame(game, player.id)) return;
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
 
   try {
     await gamesService.signupUserForGame(game.id, player.id);
@@ -222,6 +238,11 @@ const addPlayerToGame = async (game, player) => {
 };
 
 const removePlayerFromGame = async (gameId, participant) => {
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   try {
     await gamesService.removeUserFromGame(gameId, participant.userId);
     showToast("success", `Removed ${participant.username} from game`);
@@ -232,6 +253,11 @@ const removePlayerFromGame = async (gameId, participant) => {
 };
 
 const runLifecycleAction = async (game, action) => {
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   setActionLoading(game.id, action, true);
   try {
     const actionMap = {
@@ -282,6 +308,11 @@ const syncWinnerWithScores = () => {
 };
 
 const openProcessModal = (game) => {
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   const participants = game.participants || [];
   if (processCloseTimer) {
     clearTimeout(processCloseTimer);
@@ -335,6 +366,10 @@ const closeProcessModal = () => {
 const submitProcessGame = async () => {
   const game = processForm.value.game;
   if (!game) return;
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
 
   try {
     processingGame.value = true;
@@ -422,6 +457,8 @@ onMounted(() => {
       <button
         type="button"
         class="inline-flex items-center gap-2 btn-violet text-xs"
+        :disabled="isReadOnly"
+        :title="isReadOnly ? 'Organization is read-only until payment reactivation.' : ''"
         @click="openCreateModal"
       >
         <font-awesome-icon icon="plus" />
@@ -543,7 +580,8 @@ onMounted(() => {
                       v-for="participant in game.participants"
                       :key="participant.id"
                       type="button"
-                      class="inline-flex items-center gap-1 rounded-full bg-asphalt px-2 py-1 text-snow hover:bg-asphalt-light"
+                      class="inline-flex items-center gap-1 rounded-full bg-asphalt px-2 py-1 text-snow hover:bg-asphalt-light disabled:cursor-not-allowed disabled:opacity-40"
+                      :disabled="isReadOnly"
                       @click="removePlayerFromGame(game.id, participant)"
                     >
                       <font-awesome-icon icon="user-minus" />
@@ -561,7 +599,7 @@ onMounted(() => {
                       <button
                         type="button"
                         class="btn-violet text-xs disabled:cursor-not-allowed disabled:opacity-40"
-                        :disabled="(game.status || 'planned') !== 'planned' || isActionLoading(game.id, 'start')"
+                        :disabled="isReadOnly || (game.status || 'planned') !== 'planned' || isActionLoading(game.id, 'start')"
                         @click="runLifecycleAction(game, 'start')"
                       >
                         {{ isActionLoading(game.id, 'start') ? "Starting..." : "Start" }}
@@ -569,7 +607,7 @@ onMounted(() => {
                       <button
                         type="button"
                         class="rounded bg-asphalt px-3 py-2 text-snow hover:bg-asphalt-light disabled:cursor-not-allowed disabled:opacity-40"
-                        :disabled="game.status !== 'started' || isActionLoading(game.id, 'end')"
+                        :disabled="isReadOnly || game.status !== 'started' || isActionLoading(game.id, 'end')"
                         @click="runLifecycleAction(game, 'end')"
                       >
                         {{ isActionLoading(game.id, 'end') ? "Ending..." : "End" }}
@@ -577,7 +615,7 @@ onMounted(() => {
                       <button
                         type="button"
                         class="rounded bg-turf px-3 py-2 text-white hover:bg-turf-hover disabled:cursor-not-allowed disabled:opacity-40"
-                        :disabled="game.status !== 'ended' || !(game.participants || []).length"
+                        :disabled="isReadOnly || game.status !== 'ended' || !(game.participants || []).length"
                         @click="openProcessModal(game)"
                       >
                         Process scores
@@ -652,7 +690,7 @@ onMounted(() => {
                         :key="player.id"
                         type="button"
                         class="flex w-full items-center justify-between rounded px-2 py-1 text-snow hover:bg-asphalt-light disabled:cursor-not-allowed disabled:opacity-50"
-                        :disabled="isPlayerInGame(game, player.id)"
+                        :disabled="isReadOnly || isPlayerInGame(game, player.id)"
                         @click="addPlayerToGame(game, player)"
                       >
                         <span>{{ player.name }}</span>
@@ -847,6 +885,7 @@ onMounted(() => {
           <button
             type="button"
             class="inline-flex items-center gap-2 btn-violet text-xs"
+            :disabled="isReadOnly"
             @click="submitCreate"
           >
             <font-awesome-icon icon="check" />
@@ -948,7 +987,7 @@ onMounted(() => {
           <button
             type="button"
             class="inline-flex items-center gap-2 btn-violet text-xs disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="processingGame"
+            :disabled="isReadOnly || processingGame"
             @click="submitProcessGame"
           >
             <font-awesome-icon icon="check" />
@@ -959,4 +998,3 @@ onMounted(() => {
     </div>
   </section>
 </template>
-

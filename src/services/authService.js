@@ -10,6 +10,7 @@ class AuthService {
   setCurrentUser(user) {
     this.currentUser = {
       id: user.id,
+      orgId: user.orgId ?? null,
       email: user.email,
       name: user.name,
       role: user.role,
@@ -53,8 +54,12 @@ class AuthService {
    * @throws {Error} - If the login request fails or the response is not successful, an error will be thrown.
    */
   async login(email, password) {
+    return await this.managerLogin({ email, password });
+  }
+
+  async managerLogin({ orgId, email, password }) {
     try {
-      const response = await apiService.login(email, password);
+      const response = await apiService.managerLogin({ orgId, email, password });
 
       if (!response.user) {
         throw new Error("Login response missing user data.");
@@ -62,9 +67,37 @@ class AuthService {
 
       this.setCurrentUser(response.user);
 
+      if (!this.isManager()) {
+        await this.logout().catch(() => {});
+        throw new Error("Manager access is required for this dashboard.");
+      }
+
       return response;
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Manager login failed:", error);
+      this.clearSession();
+      throw error;
+    }
+  }
+
+  async adminLogin({ email, password }) {
+    try {
+      const response = await apiService.adminLogin({ email, password });
+
+      if (!response.user) {
+        throw new Error("Login response missing user data.");
+      }
+
+      this.setCurrentUser(response.user);
+
+      if (!this.isAdmin()) {
+        await this.logout().catch(() => {});
+        throw new Error("Admin access is required for this dashboard.");
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Admin login failed:", error);
       this.clearSession();
       throw error;
     }
@@ -107,6 +140,14 @@ class AuthService {
     return this.currentUser?.role === "admin";
   }
 
+  isManager() {
+    return this.currentUser?.role === "manager";
+  }
+
+  canAccessDashboard() {
+    return this.isManager() || this.isAdmin();
+  }
+
   /**
    * Check if user is logged in with JWT token validation.
    * Attempts to validate token, refresh if needed, or redirect to login.
@@ -130,6 +171,11 @@ class AuthService {
   async requireAdminSession() {
     const authenticated = await this.isLoggedInWithTokenCheck();
     return authenticated && this.isAdmin();
+  }
+
+  async requireDashboardSession() {
+    const authenticated = await this.isLoggedInWithTokenCheck();
+    return authenticated && this.canAccessDashboard();
   }
 
   /**

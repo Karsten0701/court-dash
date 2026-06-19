@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import playersService from "@/services/playersService.js";
 import gamesService from "@/services/gamesService.js";
 import apiService from "@/services/apiService.js";
+import orgService from "@/services/orgService.js";
 import { useApiRequest } from "@/composables/useApiRequest.js";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
@@ -26,6 +27,7 @@ const historyLoading = ref(false);
 const historyError = ref("");
 const selectedPlayerEloHistory = ref(null);
 const selectedPlayerGames = ref([]);
+const isReadOnly = computed(() => orgService.isInactive.value);
 
 const createForm = ref({
   email: "",
@@ -128,11 +130,20 @@ const setSort = (field) => {
 };
 
 const openCreateModal = () => {
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
   createForm.value = { email: "", username: "", password: "" };
   showCreateModal.value = true;
 };
 
 const submitCreate = async () => {
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   try {
     await playersService.createPlayer(createForm.value);
     showCreateModal.value = false;
@@ -144,6 +155,11 @@ const submitCreate = async () => {
 };
 
 const openEditModal = async (player) => {
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   selectedPlayer.value = player;
   editForm.value = {
     email: player.email || "",
@@ -156,6 +172,11 @@ const openEditModal = async (player) => {
 
 const submitEdit = async () => {
   if (!selectedPlayer.value) return;
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   try {
     const parsedElo = Number(editForm.value.elo);
     await playersService.updatePlayer(selectedPlayer.value.id, {
@@ -218,12 +239,22 @@ const openHistoryModal = async (player) => {
 };
 
 const openDeleteModal = (player) => {
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   selectedPlayer.value = player;
   showDeleteModal.value = true;
 };
 
 const confirmDelete = async () => {
   if (!selectedPlayer.value) return;
+  if (isReadOnly.value) {
+    showToast("error", "Organization is inactive. Complete payment to reactivate before making changes.");
+    return;
+  }
+
   try {
     await playersService.deletePlayer(selectedPlayer.value.id);
     showDeleteModal.value = false;
@@ -250,6 +281,8 @@ const confirmDelete = async () => {
         <button
           type="button"
           class="inline-flex items-center gap-2 btn-violet text-xs"
+          :disabled="isReadOnly"
+          :title="isReadOnly ? 'Organization is read-only until payment reactivation.' : ''"
           @click="openCreateModal"
         >
           <font-awesome-icon icon="user-plus" />
@@ -386,7 +419,8 @@ const confirmDelete = async () => {
                     </button>
                     <button
                       type="button"
-                      class="inline-flex items-center gap-1 rounded bg-asphalt px-2 py-1 text-snow hover:bg-asphalt-light"
+                      class="inline-flex items-center gap-1 rounded bg-asphalt px-2 py-1 text-snow hover:bg-asphalt-light disabled:cursor-not-allowed disabled:opacity-40"
+                      :disabled="isReadOnly"
                       @click="openEditModal(player)"
                     >
                       <font-awesome-icon icon="pen" />
@@ -394,7 +428,8 @@ const confirmDelete = async () => {
                     </button>
                     <button
                       type="button"
-                      class="inline-flex items-center gap-1 rounded bg-danger-surface px-2 py-1 text-danger hover:bg-danger-hover"
+                      class="inline-flex items-center gap-1 rounded bg-danger-surface px-2 py-1 text-danger hover:bg-danger-hover disabled:cursor-not-allowed disabled:opacity-40"
+                      :disabled="isReadOnly"
                       @click="openDeleteModal(player)"
                     >
                       <font-awesome-icon icon="trash" />
@@ -482,6 +517,7 @@ const confirmDelete = async () => {
           <button
             type="button"
             class="inline-flex items-center gap-2 btn-violet text-xs"
+            :disabled="isReadOnly"
             @click="submitCreate"
           >
             <font-awesome-icon icon="check" />
@@ -523,7 +559,7 @@ const confirmDelete = async () => {
               class="mt-1 block w-full rounded-md border border-white/5 bg-asphalt px-3 py-2 text-snow shadow-sm focus:border-racket focus:outline-none focus:ring-racket"
             >
               <option value="user">User</option>
-              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
             </select>
           </div>
           <FormInput
@@ -545,6 +581,7 @@ const confirmDelete = async () => {
           <button
             type="button"
             class="inline-flex items-center gap-2 btn-violet text-xs"
+            :disabled="isReadOnly"
             @click="submitEdit"
           >
             <font-awesome-icon icon="check" />
@@ -652,4 +689,3 @@ const confirmDelete = async () => {
     />
   </section>
 </template>
-

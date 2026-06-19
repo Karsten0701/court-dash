@@ -1,4 +1,5 @@
 import apiService from "./apiService.js";
+import authService from "./authService.js";
 
 /**
  * High-level players admin service built on top of apiService.
@@ -23,7 +24,13 @@ class PlayersService {
   }
 
   async createPlayer({ email, password, username }) {
-    return apiService.registerUser({ email, password, username });
+    const orgId = authService.getCurrentUser()?.orgId;
+
+    if (!orgId) {
+      throw new Error("Cannot create a user without an organization.");
+    }
+
+    return apiService.registerUser({ orgId, email, password, username });
   }
 
   async updatePlayer(id, payload) {
@@ -38,4 +45,3 @@ class PlayersService {
 const playersService = new PlayersService();
 
 export default playersService;
-
