@@ -125,7 +125,21 @@ class ApiService {
    * @throws {Error} - If the request fails or the response is not successful
    */
   async login(email, password) {
+    return await this.managerLogin({ email, password });
+  }
+
+  async managerLogin({ orgId, email, password }) {
     const response = await fetch(`${this.baseURL}/auth/login`, {
+      method: "POST",
+      credentials: "include",
+      headers: this.getHeaders(),
+      body: JSON.stringify({ orgId, email, password }),
+    });
+    return await this.handleResponse(response);
+  }
+
+  async adminLogin({ email, password }) {
+    const response = await fetch(`${this.baseURL}/auth/admin/login`, {
       method: "POST",
       credentials: "include",
       headers: this.getHeaders(),
@@ -180,6 +194,188 @@ class ApiService {
       {
         method: "GET",
       },
+    );
+    return await this.handleResponse(response);
+  }
+
+  // ========== ORGANIZATION ENDPOINTS ==========
+
+  async createOrg(payload) {
+    const response = await fetch(`${this.baseURL}/orgs`, {
+      method: "POST",
+      credentials: "include",
+      headers: this.getHeaders(),
+      body: JSON.stringify(payload),
+    });
+    return await this.handleResponse(response);
+  }
+
+  async simulateOrgPayment(orgId, sessionId) {
+    const response = await fetch(
+      `${this.baseURL}/orgs/${encodeURIComponent(orgId)}/payment/simulate`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: this.getHeaders(),
+        body: JSON.stringify({ sessionId }),
+      },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async listOrgs() {
+    const response = await fetch(`${this.baseURL}/orgs`, {
+      method: "GET",
+      credentials: "include",
+      headers: this.getHeaders(),
+    });
+    return await this.handleResponse(response);
+  }
+
+  async searchOrgs(query) {
+    const response = await fetch(
+      `${this.baseURL}/orgs/search?q=${encodeURIComponent(query)}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: this.getHeaders(),
+      },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async getMyOrg() {
+    const response = await this.authenticatedFetch(`${this.baseURL}/orgs/me`, {
+      method: "GET",
+    });
+    return await this.handleResponse(response);
+  }
+
+  async updateMyOrg(payload) {
+    const response = await this.authenticatedFetch(`${this.baseURL}/orgs/me`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+    return await this.handleResponse(response);
+  }
+
+  async reactivateMyOrg() {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/orgs/me/reactivate`,
+      { method: "POST" },
+    );
+    return await this.handleResponse(response);
+  }
+
+  // ========== PLATFORM ADMIN ENDPOINTS ==========
+
+  async getAdminOrgs() {
+    const response = await this.authenticatedFetch(`${this.baseURL}/admin/orgs`, {
+      method: "GET",
+    });
+    return await this.handleResponse(response);
+  }
+
+  async getAdminOrg(id) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/orgs/${encodeURIComponent(id)}`,
+      { method: "GET" },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async updateAdminOrg(id, payload) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/orgs/${encodeURIComponent(id)}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async deactivateAdminOrg(id) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/orgs/${encodeURIComponent(id)}/deactivate`,
+      { method: "POST" },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async reactivateAdminOrg(id) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/orgs/${encodeURIComponent(id)}/reactivate`,
+      { method: "POST" },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async deleteAdminOrg(id) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/orgs/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async getAdminOrgManagers(orgId) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/orgs/${encodeURIComponent(orgId)}/managers`,
+      { method: "GET" },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async createAdminOrgManager(orgId, payload) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/orgs/${encodeURIComponent(orgId)}/managers`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async updateAdminOrgManager(orgId, managerId, payload) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/orgs/${encodeURIComponent(orgId)}/managers/${encodeURIComponent(managerId)}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async deleteAdminOrgManager(orgId, managerId) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/orgs/${encodeURIComponent(orgId)}/managers/${encodeURIComponent(managerId)}`,
+      { method: "DELETE" },
+    );
+    return await this.handleResponse(response);
+  }
+
+  async getPlatformAdmins() {
+    const response = await this.authenticatedFetch(`${this.baseURL}/admin/admins`, {
+      method: "GET",
+    });
+    return await this.handleResponse(response);
+  }
+
+  async createPlatformAdmin(payload) {
+    const response = await this.authenticatedFetch(`${this.baseURL}/admin/admins`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return await this.handleResponse(response);
+  }
+
+  async deletePlatformAdmin(id) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/admin/admins/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
     );
     return await this.handleResponse(response);
   }
@@ -512,19 +708,25 @@ class ApiService {
   }
 
   /**
-   * Register a new user
+   * Register a new user (POST /api/auth/register)
    *
    * @async
-   * @param {Object} userData - User data (username, password, email)
+   * @param {Object} userData - { email, password, username? }
    * @returns {Promise<Object>} - Created user details
    * @throws {Error} - If the request fails or the response is not successful
    */
-  async registerUser(userData) {
-    const response = await fetch(`${this.baseURL}/users`, {
+  async registerUser({ email, password, username }) {
+    const body = { email, password };
+    const trimmedUsername = username?.trim();
+    if (trimmedUsername) {
+      body.username = trimmedUsername;
+    }
+
+    const response = await fetch(`${this.baseURL}/auth/register`, {
       method: "POST",
       credentials: "include",
       headers: this.getHeaders(),
-      body: JSON.stringify(userData),
+      body: JSON.stringify(body),
     });
 
     return await this.handleResponse(response);

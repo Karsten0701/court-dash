@@ -10,6 +10,7 @@ const links = [
   { id: "home", label: "Home" },
   { id: "how-it-works", label: "How it works" },
   { id: "faq", label: "FAQ" },
+  { to: "/pricing", label: "Pricing" },
 ];
 
 const scrollTo = (id) => {
@@ -20,6 +21,15 @@ const scrollTo = (id) => {
     return;
   }
   router.push({ path: "/", hash: `#${id}` });
+};
+
+const navigate = (link) => {
+  menuOpen.value = false;
+  if (link.to) {
+    router.push(link.to);
+    return;
+  }
+  scrollTo(link.id);
 };
 
 const onKeydown = (e) => {
@@ -53,16 +63,20 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
       <nav class="hidden items-center gap-1 md:flex" aria-label="Landing">
         <button
           v-for="link in links"
-          :key="link.id"
+          :key="link.id || link.to"
           type="button"
           class="rounded-full px-3 py-2 text-sm font-medium text-snow-dim transition-colors hover:bg-white/5 hover:text-snow"
-          @click="scrollTo(link.id)"
+          @click="navigate(link)"
         >
           {{ link.label }}
         </button>
       </nav>
 
       <div class="flex items-center gap-2">
+        <router-link to="/signup" class="btn-glass hidden text-xs sm:inline-flex sm:text-sm">
+          <font-awesome-icon icon="user-plus" />
+          Sign up
+        </router-link>
         <router-link to="/login" class="btn-violet text-xs sm:text-sm">
           <font-awesome-icon icon="sign-in-alt" />
           Log in
@@ -85,10 +99,10 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKeydown));
       <div class="flex flex-col gap-1">
         <button
           v-for="link in links"
-          :key="link.id"
+          :key="link.id || link.to"
           type="button"
           class="rounded-xl px-3 py-2.5 text-left text-sm font-medium text-snow-dim transition-colors hover:bg-white/5 hover:text-snow"
-          @click="scrollTo(link.id)"
+          @click="navigate(link)"
         >
           {{ link.label }}
         </button>

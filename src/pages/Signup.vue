@@ -13,7 +13,6 @@ const formData = ref({
   email: "",
   password: "",
   confirmPassword: "",
-  phone_number: "",
 });
 const error = ref("");
 const isLoading = ref(false);
@@ -21,23 +20,27 @@ const isLoading = ref(false);
 const handleSignup = async () => {
   error.value = "";
 
-  // Validation
-  if (
-    !formData.value.username ||
-    !formData.value.email ||
-    !formData.value.password
-  ) {
-    error.value = "Please fill in all required fields";
+  const email = formData.value.email.trim();
+  const username = formData.value.username.trim();
+  const password = formData.value.password;
+
+  if (!email || !password) {
+    error.value = "Email and password are required.";
     return;
   }
 
-  if (formData.value.password !== formData.value.confirmPassword) {
-    error.value = "Passwords do not match";
+  if (username && username.length < 3) {
+    error.value = "Username must be at least 3 characters.";
     return;
   }
 
-  if (formData.value.password.length < 6) {
-    error.value = "Password must be at least 6 characters";
+  if (password !== formData.value.confirmPassword) {
+    error.value = "Passwords do not match.";
+    return;
+  }
+
+  if (password.length < 6) {
+    error.value = "Password must be at least 6 characters.";
     return;
   }
 
@@ -45,28 +48,28 @@ const handleSignup = async () => {
 
   try {
     await apiService.registerUser({
-      username: formData.value.username,
-      email: formData.value.email,
-      password: formData.value.password,
-      phone_number: formData.value.phone_number,
-      role: "user",
+      email,
+      password,
+      ...(username ? { username } : {}),
     });
 
-    // Clear any existing unpaid orders data for new user
-    localStorage.removeItem("hasUnpaidOrders");
-    localStorage.removeItem("lastUnpaidOrderCheck");
+    await authService.login(email, password);
 
-    // Auto-login with the credentials just used to register
-    await authService.login(formData.value.email, formData.value.password);
+    if (authService.isAdmin()) {
+      router.push("/dashboard");
+      return;
+    }
 
-    router.push("/");
+    router.push({ path: "/", query: { registered: "1" } });
   } catch (err) {
-    // Check for different error types
-    if (err.message.includes("429") || err.message.includes("rate limit")) {
+    if (err.status === 409) {
+      error.value = "Email or username is already taken.";
+    } else if (err.status === 400) {
+      error.value =
+        err.message || "Invalid information provided. Please check your details.";
+    } else if (err.status === 429) {
       error.value = "Rate limited. Please try again later.";
-    } else if (err.message.includes("400")) {
-      error.value = "Invalid information provided. Please check your details.";
-    } else if (err.message.includes("500")) {
+    } else if (err.status === 500) {
       error.value = "Something went wrong. Please try again later.";
     } else {
       error.value =
@@ -80,35 +83,24 @@ const handleSignup = async () => {
 </script>
 
 <template>
-  <div
-    class="min-h-[calc(100dvh-var(--nav-h))] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
-  >
-    <div class="max-w-md w-full space-y-8">
-      <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-snow">
+  <div class="min-h-screen flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md">
+      <div class="mb-8 text-center">
+        <div
+          class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-grad shadow-glow"
+        >
+          <font-awesome-icon icon="user-plus" class="text-2xl text-white" />
+        </div>
+        <h2 class="text-3xl font-extrabold tracking-tight text-snow">
           Create your account
         </h2>
-        <p class="mt-2 text-center text-sm text-snow-dim">
-          Already have an account?
-          <router-link
-            to="/login"
-            class="font-medium text-racket hover:text-racket-hover"
-          >
-            Sign in
-          </router-link>
+        <p class="mt-2 text-sm text-snow-dim">
+          Register to join court games and appear on the leaderboard.
         </p>
       </div>
 
-      <form class="mt-8 space-y-6" @submit.prevent="handleSignup">
+      <form class="glass-card space-y-6 p-7" @submit.prevent="handleSignup">
         <div class="space-y-4">
-          <FormInput
-            id="username"
-            v-model="formData.username"
-            label="Name"
-            :required="true"
-            :disabled="isLoading"
-            placeholder="Name"
-          />
           <FormInput
             id="email"
             v-model="formData.email"
@@ -119,12 +111,11 @@ const handleSignup = async () => {
             placeholder="Email address"
           />
           <FormInput
-            id="phone_number"
-            v-model="formData.phone_number"
-            label="Phone Number"
-            type="tel"
+            id="username"
+            v-model="formData.username"
+            label="Username"
             :disabled="isLoading"
-            placeholder="Phone Number"
+            placeholder="Optional — defaults to your email prefix"
           />
           <FormInput
             id="password"
@@ -133,35 +124,42 @@ const handleSignup = async () => {
             type="password"
             :required="true"
             :disabled="isLoading"
-            placeholder="Password (min 6 characters)"
+            placeholder="At least 6 characters"
           />
           <FormInput
             id="confirmPassword"
             v-model="formData.confirmPassword"
-            label="Confirm Password"
+            label="Confirm password"
             type="password"
             :required="true"
             :disabled="isLoading"
-            placeholder="Confirm Password"
+            placeholder="Repeat your password"
           />
         </div>
 
-        <ErrorMessage v-if="error" title="Signup failed" :message="error" :hint="error" />
+        <ErrorMessage
+          v-if="error"
+          title="Signup failed"
+          :message="error"
+          :hint="error"
+        />
 
-        <div>
-          <button
-            type="submit"
-            :disabled="isLoading"
-            class="btn-violet w-full py-3"
+        <button type="submit" :disabled="isLoading" class="btn-violet w-full py-3">
+          <LoadingSpinner v-if="isLoading" class="text-white" />
+          <font-awesome-icon v-else icon="user-plus" />
+          <span>{{ isLoading ? "Creating account..." : "Create account" }}</span>
+        </button>
+
+        <p class="text-center text-sm text-snow-dim">
+          Already have an account?
+          <router-link
+            to="/login"
+            class="font-medium text-racket hover:text-racket-hover"
           >
-            <LoadingSpinner v-if="isLoading" class="text-white" />
-            <font-awesome-icon v-else icon="user-plus" />
-            <span>{{ isLoading ? "Creating account..." : "Sign up" }}</span>
-          </button>
-        </div>
+            Sign in
+          </router-link>
+        </p>
       </form>
     </div>
   </div>
 </template>
-
-<style scoped></style>

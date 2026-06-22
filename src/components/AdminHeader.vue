@@ -7,7 +7,7 @@ import authService from "@/services/authService.js";
 const route = useRoute();
 const router = useRouter();
 
-const tabs = [
+const managerTabs = [
   { to: "/dashboard", label: "Overview", name: "Dashboard", icon: "house" },
   { to: "/players", label: "Players", name: "Players", icon: "users" },
   { to: "/games", label: "Games", name: "Games", icon: "table-tennis-paddle-ball" },
@@ -15,6 +15,13 @@ const tabs = [
 
 const activeTabName = computed(() => route.name);
 const currentUser = computed(() => authService.getCurrentUser());
+
+const tabs = computed(() =>
+  authService.isAdmin()
+    ? [{ to: "/dashboard", label: "Platform", name: "Dashboard", icon: "server" }]
+    : managerTabs,
+);
+
 const userInitial = computed(() =>
   (currentUser.value?.name || currentUser.value?.email || "A")
     .charAt(0)
@@ -22,7 +29,9 @@ const userInitial = computed(() =>
 );
 
 const pageTitle = computed(() => {
-  if (route.name === "Dashboard") return "Overview";
+  if (route.name === "Dashboard") {
+    return authService.isAdmin() ? "Platform" : "Overview";
+  }
   return route.name || "Dashboard";
 });
 
@@ -89,7 +98,7 @@ const handleLogout = async () => {
           </span>
           <div class="leading-tight text-left">
             <p class="font-medium text-snow text-xs">
-              {{ currentUser?.name || "Admin" }}
+              {{ currentUser?.name || "User" }}
             </p>
             <p class="text-[10px] text-asphalt-muted">Logout</p>
           </div>

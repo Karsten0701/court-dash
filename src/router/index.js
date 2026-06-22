@@ -3,16 +3,22 @@ import authService from "@/services/authService.js";
 import appConfig from "@/config/appConfig.js";
 
 const Landing = () => import("@/pages/Landing.vue");
+const Pricing = () => import("@/pages/Pricing.vue");
 const Dashboard = () => import("@/pages/Dashboard.vue");
 const Players = () => import("@/pages/Players.vue");
 const Games = () => import("@/pages/Games.vue");
 const Login = () => import("@/pages/Login.vue");
 const NotFound = () => import("@/pages/NotFound.vue");
 
-const adminMeta = (title) => ({
+const dashboardMeta = (title) => ({
   title,
   requiresAuth: true,
-  requiresAdmin: true,
+  requiresDashboardAccess: true,
+});
+
+const managerMeta = (title) => ({
+  ...dashboardMeta(title),
+  requiresManager: true,
 });
 
 const routes = [
@@ -23,22 +29,28 @@ const routes = [
     meta: { title: appConfig.name, isLanding: true },
   },
   {
+    path: "/pricing",
+    name: "Pricing",
+    component: Pricing,
+    meta: { title: `Pricing • ${appConfig.name}`, isLanding: true },
+  },
+  {
     path: "/dashboard",
     name: "Dashboard",
     component: Dashboard,
-    meta: adminMeta(`Overview • ${appConfig.name}`),
+    meta: dashboardMeta(`Overview • ${appConfig.name}`),
   },
   {
     path: "/players",
     name: "Players",
     component: Players,
-    meta: adminMeta(`Players • ${appConfig.name}`),
+    meta: managerMeta(`Players • ${appConfig.name}`),
   },
   {
     path: "/games",
     name: "Games",
     component: Games,
-    meta: adminMeta(`Games • ${appConfig.name}`),
+    meta: managerMeta(`Games • ${appConfig.name}`),
   },
   {
     path: "/login",
@@ -49,8 +61,8 @@ const routes = [
   {
     path: "/signup",
     name: "Signup",
-    redirect: { name: "Login" },
-    meta: { title: `Login • ${appConfig.name}` },
+    redirect: { name: "Pricing" },
+    meta: { title: `Pricing • ${appConfig.name}` },
   },
   {
     path: "/:pathMatch(.*)*",
@@ -75,8 +87,8 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   document.title = to.meta.title || appConfig.name;
 
-  if (to.name === "Landing") {
-    if (!authService.isAuthenticated() || !authService.isAdmin()) {
+  if (to.name === "Landing" || to.name === "Pricing") {
+    if (!authService.isAuthenticated() || !authService.canAccessDashboard()) {
       next();
       return;
     }
@@ -102,18 +114,23 @@ router.beforeEach(async (to, from, next) => {
       return;
     }
 
-    if (to.meta.requiresAdmin && !authService.isAdmin()) {
+    if (to.meta.requiresDashboardAccess && !authService.canAccessDashboard()) {
       await authService.logout().catch(() => {});
       next({
         name: "Login",
-        query: { reason: "admin", redirect: to.fullPath },
+        query: { reason: "dashboard", redirect: to.fullPath },
       });
+      return;
+    }
+
+    if (to.meta.requiresManager && !authService.isManager()) {
+      next({ name: "Dashboard" });
       return;
     }
   }
 
   if (to.name === "Login" && authService.isAuthenticated()) {
-    if (!authService.isAdmin()) {
+    if (!authService.canAccessDashboard()) {
       await authService.logout().catch(() => {});
       next();
       return;

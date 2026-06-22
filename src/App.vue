@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import AdminHeader from "./components/AdminHeader.vue";
 import LandingHeader from "./components/LandingHeader.vue";
 import LandingFooter from "./components/LandingFooter.vue";
+import ManagerOrgStatusBanner from "./components/ManagerOrgStatusBanner.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -21,6 +22,7 @@ router.isReady().then(() => {
 <template>
   <div class="min-h-screen bg-court text-snow">
     <AdminHeader v-if="showAdminShell" />
+    <ManagerOrgStatusBanner v-if="showAdminShell" />
     <LandingHeader v-else-if="showLandingShell" />
 
     <main

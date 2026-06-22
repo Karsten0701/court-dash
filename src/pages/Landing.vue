@@ -1,9 +1,29 @@
 <script setup>
-import { onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import appConfig from "@/config/appConfig";
 
 const route = useRoute();
+const showRegisteredBanner = ref(route.query.registered === "1");
+
+const registeredMessage = computed(() =>
+  showRegisteredBanner.value
+    ? "Account created. You are signed in and can join court games when they are scheduled."
+    : "",
+);
+
+onMounted(() => {
+  if (route.query.registered === "1") {
+    showRegisteredBanner.value = true;
+  }
+
+  if (route.hash) {
+    const id = route.hash.replace("#", "");
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+});
 
 const steps = [
   {
@@ -34,26 +54,17 @@ const faqs = [
   },
   {
     q: "Do I need an account?",
-    a: "Yes, to sign up for games and appear on the leaderboard. Ask an admin if you need an invite or help getting set up.",
+    a: "Yes. Create an account on the sign-up page, then an admin can add you to upcoming games or you can sign up once sessions are open.",
   },
   {
     q: "Who runs the games?",
     a: "Admins schedule sessions, manage signups, and process results through the dashboard after each court day.",
   },
   {
-    q: "I run the league — where do I log in?",
-    a: "Use the Log in button. Admin accounts land in the dashboard to manage players, games, and standings.",
+    q: "How do I start my own court group?",
+    a: "Go to Pricing, pick a plan, and create your organization. After the simulated payment your org becomes active and you can log in as manager.",
   },
 ];
-
-onMounted(() => {
-  if (route.hash) {
-    const id = route.hash.replace("#", "");
-    requestAnimationFrame(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    });
-  }
-});
 </script>
 
 <template>
@@ -79,10 +90,21 @@ onMounted(() => {
           Built for our group — not another generic sports app.
         </p>
 
+        <div
+          v-if="registeredMessage"
+          class="mt-6 rounded-2xl border border-turf/30 bg-turf/10 px-4 py-3 text-sm text-snow"
+        >
+          {{ registeredMessage }}
+        </div>
+
         <div class="mt-8 flex flex-wrap items-center gap-3">
-          <router-link to="/login" class="btn-violet">
+          <router-link to="/pricing" class="btn-violet">
+            <font-awesome-icon icon="credit-card" />
+            View pricing
+          </router-link>
+          <router-link to="/login" class="btn-glass">
             <font-awesome-icon icon="sign-in-alt" />
-            Log in to dashboard
+            Log in
           </router-link>
           <a href="#how-it-works" class="btn-glass">
             How it works
@@ -193,8 +215,8 @@ onMounted(() => {
               Admins use the dashboard to run games and update standings.
             </p>
           </div>
-          <router-link to="/login" class="btn-violet mt-4 shrink-0 sm:mt-0">
-            Go to dashboard
+          <router-link to="/pricing" class="btn-violet mt-4 shrink-0 sm:mt-0">
+            View pricing
           </router-link>
         </div>
       </div>

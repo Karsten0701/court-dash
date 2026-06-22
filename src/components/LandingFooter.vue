@@ -13,8 +13,8 @@ import appConfig from "@/config/appConfig";
           Court sessions, ELO rankings, one ladder.
         </p>
       </div>
-      <router-link to="/login" class="btn-glass text-xs">
-        Admin log in
+      <router-link to="/pricing" class="btn-glass text-xs">
+        Start an organization
       </router-link>
     </div>
   </footer>
